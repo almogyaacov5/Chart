@@ -34,7 +34,7 @@ public class PortfolioAddStockFragment extends Fragment {
             String ticker = editTicker.getText().toString().trim().toUpperCase();
             String priceStr = editBuyPrice.getText().toString().trim();
             if (ticker.isEmpty() || priceStr.isEmpty()) {
-                Toast.makeText(getContext(), "נא להזין טיקר ומחיר", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Enter a ticker and price", Toast.LENGTH_SHORT).show();
                 return;
             }
             float price = Float.parseFloat(priceStr);
