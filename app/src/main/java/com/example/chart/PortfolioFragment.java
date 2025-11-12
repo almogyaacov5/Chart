@@ -10,13 +10,6 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +17,8 @@ public class PortfolioFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private Button btnAddStockToPortfolio;
-    private List<StockData> stocksList = new ArrayList<>();
+    private List<StockData> stocksList;
     private StocksAdapter adapter;
-    private DatabaseReference stocksRef;
 
     @Nullable
     @Override
@@ -34,29 +26,22 @@ public class PortfolioFragment extends Fragment {
                              @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_portfolio, container, false);
 
-        recyclerView = v.findViewById(R.id.tradesRecyclerView); // או שם שונה אם השתמשת ב-id אחר
+        recyclerView = v.findViewById(R.id.tradesRecyclerView);
         btnAddStockToPortfolio = v.findViewById(R.id.btnAddStockToPortfolio);
+
+        stocksList = getDemoPortfolio(); // תעדכן פה טעינה מ־DB אם צריך
 
         adapter = new StocksAdapter(stocksList, new StocksAdapter.OnStockClickListener() {
             @Override
-            public void onStockClick(String symbol) {
-                // כאן אפשר להוסיף לוגיקה להציג פירוט/גרף וכו'
-            }
+            public void onStockClick(String symbol) {}
             @Override
-            public void onStockDelete(String symbol) {
-                stocksRef.child(symbol).removeValue();
-            }
+            public void onStockDelete(String symbol) {}
         });
 
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        stocksRef = FirebaseDatabase.getInstance().getReference("portfolio-stocks");
-
-        loadPortfolioStocks();
-
         btnAddStockToPortfolio.setOnClickListener(view -> {
-            // פותח את דף ההוספה החדש
             requireActivity().getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new PortfolioAddStockFragment())
                     .addToBackStack(null)
@@ -66,21 +51,10 @@ public class PortfolioFragment extends Fragment {
         return v;
     }
 
-    private void loadPortfolioStocks() {
-        stocksRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                stocksList.clear();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    StockData data = ds.getValue(StockData.class);
-                    if (data != null) stocksList.add(data);
-                }
-                adapter.notifyDataSetChanged();
-            }
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // טיפול בשגיאות (ניתן להציג Toast אם נדרש)
-            }
-        });
+    private List<StockData> getDemoPortfolio() {
+        List<StockData> list = new ArrayList<>();
+        list.add(new StockData("AAPL", 150, 0));
+        list.add(new StockData("TSLA", 1000, 0));
+        return list;
     }
 }

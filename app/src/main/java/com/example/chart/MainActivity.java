@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        // מסך ברירת מחדל - גרף
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_container, new ChartFragment())
@@ -68,10 +69,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             selectedFragment = new ChartFragment();
             title = "Chart";
         } else if (id == R.id.nav_stocks) {
-            selectedFragment = new StocksFragment();
+            // כאן: רשימת מעקב! (My Stocks)
+            selectedFragment = new WatchlistFragment();
             title = "My Stocks";
         } else if (id == R.id.nav_portfolio) {
-            selectedFragment = new WatchlistFragment();
+            selectedFragment = new PortfolioFragment();
             title = "Portfolio";
         }
 
@@ -86,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-
     public void showChartWithSymbol(String symbol) {
         ChartFragment chartFragment = new ChartFragment();
         Bundle args = new Bundle();
@@ -96,7 +97,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, chartFragment)
                 .commit();
-        setTitle("Chart");
+
         navigationView.setCheckedItem(R.id.nav_chart);
     }
 }

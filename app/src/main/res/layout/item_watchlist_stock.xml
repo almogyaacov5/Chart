@@ -4,14 +4,15 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="12dp">
+    android:padding="12dp"
+    android:layoutDirection="ltr">
 
-
-<LinearLayout
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_weight="1">
+        android:layout_weight="1"
+        android:layoutDirection="ltr">
 
         <TextView
             android:id="@+id/stockSymbolText"
@@ -19,19 +20,22 @@
             android:layout_height="wrap_content"
             android:text="AAPL"
             android:textSize="20sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold"
+            android:textAlignment="viewStart"/>
 
         <TextView
             android:id="@+id/stockPriceText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="שווי מניה: 0"/>
+            android:text="Stock Price: 0"
+            android:textAlignment="viewStart"/>
 
         <TextView
             android:id="@+id/stockDayChangeText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="שינוי יומי: 0.00%"/>
+            android:text="Day Change: 0.00%"
+            android:textAlignment="viewStart"/>
     </LinearLayout>
 
     <ImageButton
@@ -41,9 +45,6 @@
         android:src="@android:drawable/ic_delete"
         app:tint="#2196F3"
         android:background="?attr/selectableItemBackground"
-        android:contentDescription="מחק ממעקב"
+        android:contentDescription="Delete from Watchlist"
         android:layout_gravity="center"/>
-
-
-
 </LinearLayout>

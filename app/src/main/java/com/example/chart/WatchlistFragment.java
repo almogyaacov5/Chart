@@ -9,7 +9,16 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
+
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,12 +26,13 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
 
     private List<StockWatchData> watchlist;
     private WatchlistAdapter adapter;
+    private DatabaseReference watchlistRef;
 
-    @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_watchlist, container, false);
 
+        watchlistRef = FirebaseDatabase.getInstance().getReference("watchlist-stocks");
         watchlist = new ArrayList<>();
         adapter = new WatchlistAdapter(watchlist, this);
 
@@ -30,10 +40,39 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
 
-        // דוגמה: הוספת כמה מניות למעקב (תמחק או תביא מנתונים אמיתיים)
-        watchlist.add(new StockWatchData("AAPL", 158.5f, 1.12f));
-        watchlist.add(new StockWatchData("TSLA", 234.1f, -2.45f));
-        adapter.notifyDataSetChanged();
+        EditText stockInput = v.findViewById(R.id.stockInput);
+        Button addStockBtn = v.findViewById(R.id.addStockBtn);
+        ImageButton btnRefreshAll = v.findViewById(R.id.btnRefreshAll);
+
+        addStockBtn.setOnClickListener(view -> {
+            String symbol = stockInput.getText().toString().trim().toUpperCase();
+            if (!symbol.isEmpty()) {
+                StockWatchData stock = new StockWatchData(symbol, 0f, 0f);
+                watchlistRef.child(symbol).setValue(stock);
+                stockInput.setText("");
+            }
+        });
+
+        btnRefreshAll.setOnClickListener(view -> {
+            adapter.notifyDataSetChanged();
+            Toast.makeText(getContext(), "רשימת מעקב רועננה", Toast.LENGTH_SHORT).show();
+        });
+
+        watchlistRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                watchlist.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    StockWatchData data = ds.getValue(StockWatchData.class);
+                    if (data != null) watchlist.add(data);
+                }
+                adapter.notifyDataSetChanged();
+            }
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(getContext(), "שגיאה בטעינת רשימת המעקב", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         return v;
     }
@@ -45,17 +84,7 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
 
     @Override
     public void onStockDelete(String symbol) {
-        int pos = -1;
-        for (int i = 0; i < watchlist.size(); i++) {
-            if (watchlist.get(i).symbol.equals(symbol)) {
-                pos = i;
-                break;
-            }
-        }
-        if (pos != -1) {
-            watchlist.remove(pos);
-            adapter.notifyItemRemoved(pos);
-            Toast.makeText(getContext(), "נמחקה מניה: " + symbol, Toast.LENGTH_SHORT).show();
-        }
+        watchlistRef.child(symbol).removeValue();
+        Toast.makeText(getContext(), "המניה הוסרה", Toast.LENGTH_SHORT).show();
     }
 }

@@ -51,9 +51,9 @@ public class StocksFragment extends Fragment implements StocksAdapter.OnStockCli
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_stocks, container, false);
+        View view = inflater.inflate(R.layout.fragment_watchlist, container, false);
 
-        stocksRecyclerView = view.findViewById(R.id.stocksRecyclerView);
+        stocksRecyclerView = view.findViewById(R.id.watchlistRecyclerView);
         stockInput = view.findViewById(R.id.stockInput);
         addStockBtn = view.findViewById(R.id.addStockBtn);
         btnRefreshAll = view.findViewById(R.id.btnRefreshAll);

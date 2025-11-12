@@ -1,11 +1,61 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#F7F9FB">
 
+    <!-- שורת הכנסה ופעולה -->
+    <LinearLayout
+        android:id="@+id/row_actions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/stockInput"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="48dp"
+            android:hint="Enter a ticker"
+            android:textColor="#343A40"
+            android:textSize="16sp"
+            android:imeOptions="actionDone"
+            android:background="@android:color/transparent"
+            android:padding="8dp"/>
+
+        <Button
+            android:id="@+id/addStockBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="48dp"
+            android:text="Add"
+            android:backgroundTint="#1976D2"
+            android:textColor="@android:color/white"
+            android:layout_marginStart="8dp"/>
+
+        <ImageButton
+            android:id="@+id/btnRefreshAll"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:src="@drawable/outline_3d_rotation_24"
+            android:background="@drawable/circle_button_bg"
+            app:tint="@color/colorPrimary"
+            android:layout_marginStart="8dp"
+            android:contentDescription="רענן את המעקב"/>
+    </LinearLayout>
+
+    <!-- הרשימה של המניות -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/watchlistRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp"/>
+
 </LinearLayout>
+
