@@ -1,0 +1,9 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item android:id="@+id/nav_chart" android:title="Chart" />
+        <item android:id="@+id/nav_stocks" android:title="My Stocks" />
+        <item android:id="@+id/nav_portfolio" android:title="Portfolio" />
+
+
+    </group>
+</menu>

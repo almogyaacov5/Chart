@@ -1,0 +1,32 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="32dp"
+    android:gravity="center">
+
+    <EditText
+        android:id="@+id/editTicker"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="טיקר מניה (למשל TSLA)"
+        android:textSize="20sp"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/editBuyPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="מחיר קנייה"
+        android:textSize="20sp"
+        android:inputType="numberDecimal"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btnAddStock"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="הוסף"
+        android:layout_marginTop="24dp" />
+</LinearLayout>

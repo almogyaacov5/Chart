@@ -1,0 +1,162 @@
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F6F8"
+    tools:context=".MainActivity">
+
+    <!-- מחיר נוכחי -->
+    <TextView
+        android:id="@+id/priceText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Current price: "
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#1E3A8A"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="24dp" />
+
+    <!-- שינוי יומי -->
+    <TextView
+        android:id="@+id/changeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Daily change: "
+        android:textSize="16sp"
+        android:textColor="#374151"
+        app:layout_constraintTop_toBottomOf="@id/priceText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="4dp" />
+
+    <!-- טיקר -->
+    <TextView
+        android:id="@+id/tickerText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ticker: "
+        android:textSize="16sp"
+        android:textColor="#374151"
+        app:layout_constraintTop_toBottomOf="@id/changeText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="4dp" />
+
+    <!-- כניסת טיקר -->
+    <EditText
+        android:id="@+id/ticker_input"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Enter a ticker like NVDA"
+        android:padding="12dp"
+        android:textColor="#111827"
+        android:textColorHint="#9CA3AF"
+        android:textSize="16sp"
+        app:layout_constraintTop_toBottomOf="@id/tickerText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginHorizontal="32dp"
+        android:layout_marginTop="12dp" />
+
+    <!-- כפתור טעינה -->
+    <Button
+        android:id="@+id/btnLoad"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Open chart"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#2563EB"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="10dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/ticker_input"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- גרף מניה נרות -->
+    <com.github.mikephil.charting.charts.CandleStickChart
+        android:id="@+id/stock_chart"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/btnLoad"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/controls_row"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:elevation="4dp" />
+
+    <!-- גרף קווי -->
+    <com.github.mikephil.charting.charts.LineChart
+        android:id="@+id/line_chart"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toBottomOf="@id/btnLoad"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/controls_row"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="8dp"
+        android:elevation="4dp"
+        android:visibility="gone"/>
+
+    <!-- שורת כפתורי פקדים -->
+    <LinearLayout
+        android:id="@+id/controls_row"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/timeFrameText"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp">
+
+        <!-- כפתור בחירת טיים פריים -->
+        <Button
+            android:id="@+id/btnSelectTimeFrame"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Time frame"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#4B5563"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:layout_marginHorizontal="8dp"/>
+
+        <!-- כפתור החלפת גרף -->
+        <Button
+            android:id="@+id/btnToggleChart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Line chart"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#1E3A8A"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="8dp"
+            android:layout_marginHorizontal="8dp"/>
+    </LinearLayout>
+
+    <!-- כיתוב תקופת זמן -->
+    <TextView
+        android:id="@+id/timeFrameText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Time frame: "
+        android:textSize="16sp"
+        android:textColor="#374151"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="12dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
