@@ -122,6 +122,16 @@
         android:layout_marginBottom="8dp">
 
         <!-- כפתור בחירת טיים פריים -->
+        <ImageButton
+            android:id="@+id/btnChartRefresh"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="@drawable/circle_button_background"
+            android:contentDescription="רענן את המעקב"
+            android:src="@drawable/outline_3d_rotation_24"
+            app:tint="@color/colorPrimary" />
+
         <Button
             android:id="@+id/btnSelectTimeFrame"
             android:layout_width="wrap_content"
@@ -134,16 +144,18 @@
             android:layout_marginHorizontal="8dp"/>
 
         <!-- כפתור החלפת גרף -->
+
         <Button
             android:id="@+id/btnToggleChart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Line chart"
-            android:textColor="#FFFFFF"
+            android:layout_marginHorizontal="8dp"
             android:backgroundTint="#1E3A8A"
             android:paddingHorizontal="16dp"
             android:paddingVertical="8dp"
-            android:layout_marginHorizontal="8dp"/>
+            android:text="Line chart"
+            android:textColor="#FFFFFF" />
+
     </LinearLayout>
 
     <!-- כיתוב תקופת זמן -->
@@ -158,5 +170,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="12dp"/>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

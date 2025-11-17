@@ -43,7 +43,7 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/outline_3d_rotation_24"
-            android:background="@drawable/circle_button_bg"
+            android:background="@drawable/circle_button_background"
             app:tint="@color/colorPrimary"
             android:layout_marginStart="8dp"
             android:contentDescription="רענן את המעקב"/>

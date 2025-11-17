@@ -8,10 +8,10 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
-
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
 import com.github.mikephil.charting.charts.CandleStickChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.data.CandleEntry;
@@ -20,13 +20,10 @@ import com.github.mikephil.charting.data.CandleData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.Entry;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -47,9 +44,10 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
     private String interval = "1day";
     private boolean isCandleStick = true;
 
+
+    @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_chart, container, false);
 
         candleStickChart = v.findViewById(R.id.stock_chart);
@@ -63,9 +61,15 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         timeFrameText = v.findViewById(R.id.timeFrameText);
         tickerText = v.findViewById(R.id.tickerText);
 
+        // קבלת הסימבול מה-arguments
         if (getArguments() != null && getArguments().containsKey("symbol")) {
             symbol = getArguments().getString("symbol", symbol);
             if (tickerInput != null) tickerInput.setText(symbol);
+        }
+
+        // עדכון כותרת לפי המניה:
+        if (getActivity() != null) {
+            getActivity().setTitle("Chart: " + symbol);
         }
 
         timeFrameText.setText("Time frame: " + interval);
@@ -76,18 +80,25 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
 
         btnLoad.setOnClickListener(v1 -> {
             String userInput = tickerInput.getText().toString().trim();
+            ImageButton btnChartRefresh = v.findViewById(R.id.btnChartRefresh);
             if (!userInput.isEmpty()) {
                 symbol = userInput.toUpperCase();
                 tickerText.setText("Ticker: " + symbol);
+                if (getActivity() != null) {
+                    getActivity().setTitle("Chart: " + symbol);
+                    btnChartRefresh.setOnClickListener(v.findViewById(R.id.btnChartRefresh));
+
+                }
                 fetchStockData(symbol, interval);
             }
-            // הסתרת המקלדת תמיד
             hideKeyboard();
             tickerInput.clearFocus();
         });
 
+        // כאן הוספת פתיחת דיאלוג טיים פריים:
         btnTimeFrame.setOnClickListener(v1 -> {
-            new TimeFrameFragment().show(getChildFragmentManager(), "timeframe");
+            TimeFrameFragment dialog = new TimeFrameFragment();
+            dialog.show(getChildFragmentManager(), "timeframe");
         });
 
         btnToggleChart.setOnClickListener(v1 -> {
@@ -115,8 +126,8 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         fetchStockData(symbol, interval);
     }
 
+
     private void hideKeyboard() {
-        // הסתרה אמינה גם לפוקוס שונה
         View view = getActivity().getCurrentFocus();
         if (view == null) view = getView();
         if (view != null) {
@@ -132,9 +143,7 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         Request request = new Request.Builder().url(url).build();
         client.newCall(request).enqueue(new Callback() {
             @Override
-            public void onFailure(Call call, IOException e) {
-                // אפשר (לרשותך) לטפל בשגיאות פה
-            }
+            public void onFailure(Call call, IOException e) { }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -144,16 +153,8 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
                     JSONArray series = json.getJSONArray("values");
                     List<CandleEntry> candleEntries = new ArrayList<>();
                     float lastClose = 0, prevClose = 0;
-
-                    if (series.length() > 0) {
-                        JSONObject last = series.getJSONObject(0);
-                        lastClose = Float.parseFloat(last.getString("close"));
-                    }
-                    if (series.length() > 1) {
-                        JSONObject prev = series.getJSONObject(1);
-                        prevClose = Float.parseFloat(prev.getString("close"));
-                    }
-
+                    if (series.length() > 0) lastClose = Float.parseFloat(series.getJSONObject(0).getString("close"));
+                    if (series.length() > 1) prevClose = Float.parseFloat(series.getJSONObject(1).getString("close"));
                     int chartIndex = 0;
                     for (int i = series.length() - 1; i >= 0 && chartIndex < 40; i--, chartIndex++) {
                         JSONObject data = series.getJSONObject(i);
@@ -163,7 +164,6 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
                         float close = Float.parseFloat(data.getString("close"));
                         candleEntries.add(new CandleEntry(chartIndex, high, low, open, close));
                     }
-
                     float change = lastClose - prevClose;
                     float changePercent = (prevClose != 0) ? (change / prevClose) * 100 : 0;
                     final float dispClose = lastClose;
@@ -193,7 +193,7 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
     }
 
     private void updateChart(List<CandleEntry> entries) {
-        CandleDataSet dataSet = new CandleDataSet(entries, "גרף מניה");
+        CandleDataSet dataSet = new CandleDataSet(entries, "Stock chart");
         dataSet.setDecreasingColor(android.graphics.Color.RED);
         dataSet.setIncreasingColor(android.graphics.Color.GREEN);
         dataSet.setShadowColor(android.graphics.Color.DKGRAY);

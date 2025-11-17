@@ -55,7 +55,7 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
 
         btnRefreshAll.setOnClickListener(view -> {
             adapter.notifyDataSetChanged();
-            Toast.makeText(getContext(), "רשימת מעקב רועננה", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Watchlist refreshed", Toast.LENGTH_SHORT).show();
         });
 
         watchlistRef.addValueEventListener(new ValueEventListener() {
@@ -77,10 +77,20 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
         return v;
     }
 
+
     @Override
     public void onStockClick(String symbol) {
-        Toast.makeText(getContext(), "לחצת על " + symbol, Toast.LENGTH_SHORT).show();
+        ChartFragment chartFragment = new ChartFragment();
+        Bundle args = new Bundle();
+        args.putString("symbol", symbol);
+        chartFragment.setArguments(args);
+
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, chartFragment)
+                .addToBackStack(null)
+                .commit();
     }
+
 
     @Override
     public void onStockDelete(String symbol) {

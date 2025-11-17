@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton ;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -21,6 +22,7 @@ import java.util.List;
 public class PortfolioFragment extends Fragment {
 
     private RecyclerView recyclerView;
+    private ImageButton  btnRefreshPortfolio;
     private Button btnAddStockToPortfolio;
     private List<StockData> stocksList;
     private StocksAdapter adapter;
@@ -34,6 +36,7 @@ public class PortfolioFragment extends Fragment {
 
         recyclerView = v.findViewById(R.id.tradesRecyclerView);
         btnAddStockToPortfolio = v.findViewById(R.id.btnAddStockToPortfolio);
+        btnRefreshPortfolio = v.findViewById(R.id.btnRefreshPortfolio);
 
         stocksList = new ArrayList<>();
         portfolioRef = FirebaseDatabase.getInstance().getReference("portfolio-stocks");
@@ -41,7 +44,6 @@ public class PortfolioFragment extends Fragment {
         adapter = new StocksAdapter(stocksList, new StocksAdapter.OnStockClickListener() {
             @Override
             public void onStockClick(String symbol) {}
-
             @Override
             public void onStockDelete(String symbol) {
                 portfolioRef.child(symbol).removeValue();
@@ -70,6 +72,10 @@ public class PortfolioFragment extends Fragment {
                     .replace(R.id.fragment_container, new PortfolioAddStockFragment())
                     .addToBackStack(null)
                     .commit();
+        });
+
+        btnRefreshPortfolio.setOnClickListener(view -> {
+            adapter.refreshPrices();
         });
 
         return v;

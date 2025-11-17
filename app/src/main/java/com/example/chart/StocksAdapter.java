@@ -112,4 +112,8 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.StockViewH
             deleteButton = itemView.findViewById(R.id.btnDeleteStock);
         }
     }
+    public void refreshPrices() {
+        notifyDataSetChanged();
+    }
+
 }

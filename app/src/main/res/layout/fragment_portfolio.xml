@@ -1,22 +1,57 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#F4F6F8"
     android:orientation="vertical"
     android:padding="16dp"
-    android:background="#F4F6F8">
+    android:rotation="0"
+    android:rotationX="0"
+    android:rotationY="0">
 
-    <Button
-        android:id="@+id/btnAddStockToPortfolio"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="הוסף מניה לתיק"
-        android:layout_marginBottom="14dp"/>
+    <!-- Row for Add and Refresh -->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/tradesRecyclerView"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="468dp"
         android:layout_weight="1"
-        android:padding="8dp"/>
+        android:background="#FFFFFF"
+        android:clipToPadding="false"
+        android:padding="8dp"
+        android:scrollbars="vertical" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="14dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <ImageButton
+            android:id="@+id/btnRefreshPortfolio"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:background="@drawable/circle_button_background"
+            android:contentDescription="רענן את המעקב"
+            android:src="@drawable/outline_3d_rotation_24"
+            app:tint="@color/colorPrimary" />
+
+        <Button
+            android:id="@+id/btnAddStockToPortfolio"
+            android:layout_width="275dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#2563EB"
+            android:elevation="2dp"
+            android:text="Add Trade"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+
 </LinearLayout>
+
