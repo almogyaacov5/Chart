@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.github.mikephil.charting.charts.CandleStickChart;
@@ -80,20 +82,25 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
 
         btnLoad.setOnClickListener(v1 -> {
             String userInput = tickerInput.getText().toString().trim();
-            ImageButton btnChartRefresh = v.findViewById(R.id.btnChartRefresh);
+            ImageButton btnChartRefresh = v1.getRootView().findViewById(R.id.btnChartRefresh);
             if (!userInput.isEmpty()) {
-                symbol = userInput.toUpperCase();
+                String symbol = userInput.toUpperCase();
                 tickerText.setText("Ticker: " + symbol);
                 if (getActivity() != null) {
                     getActivity().setTitle("Chart: " + symbol);
-                    btnChartRefresh.setOnClickListener(v.findViewById(R.id.btnChartRefresh));
-
                 }
                 fetchStockData(symbol, interval);
+
+                // כאן מגדירים את כפתור הריפרש עם פעולה נכונה
+                btnChartRefresh.setOnClickListener(v2 -> {
+                    fetchStockData(symbol, interval);
+                });
             }
             hideKeyboard();
             tickerInput.clearFocus();
+
         });
+
 
         // כאן הוספת פתיחת דיאלוג טיים פריים:
         btnTimeFrame.setOnClickListener(v1 -> {

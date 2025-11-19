@@ -39,7 +39,7 @@
             android:layout_marginStart="8dp"/>
 
         <ImageButton
-            android:id="@+id/btnRefreshAll"
+            android:id="@+id/btnRefreshWatchlist"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/outline_3d_rotation_24"

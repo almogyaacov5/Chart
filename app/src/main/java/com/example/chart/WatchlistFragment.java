@@ -42,7 +42,7 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
 
         EditText stockInput = v.findViewById(R.id.stockInput);
         Button addStockBtn = v.findViewById(R.id.addStockBtn);
-        ImageButton btnRefreshAll = v.findViewById(R.id.btnRefreshAll);
+        ImageButton btnRefreshWatchlist = v.findViewById(R.id.btnRefreshWatchlist);
 
         addStockBtn.setOnClickListener(view -> {
             String symbol = stockInput.getText().toString().trim().toUpperCase();
@@ -53,7 +53,7 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
             }
         });
 
-        btnRefreshAll.setOnClickListener(view -> {
+        btnRefreshWatchlist.setOnClickListener(view -> {
             adapter.notifyDataSetChanged();
             Toast.makeText(getContext(), "Watchlist refreshed", Toast.LENGTH_SHORT).show();
         });
