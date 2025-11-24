@@ -1,8 +1,12 @@
 package com.example.chart;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
@@ -20,7 +24,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.StockViewH
 
     public interface OnStockClickListener {
         void onStockClick(String symbol);
-        void onStockDelete(String symbol);
+        void onStockDelete(String symbol, double sellPrice); // ← מעביר גם את מחיר הסגירה
     }
 
     private List<StockData> stocks;
@@ -35,7 +39,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.StockViewH
     @NonNull
     @Override
     public StockViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_stock, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_portfolio, parent, false);
         return new StockViewHolder(v);
     }
 
@@ -60,7 +64,11 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.StockViewH
             }
         });
 
-        holder.deleteButton.setOnClickListener(view -> listener.onStockDelete(stock.symbol));
+        // כפתור סגירה עם דיאלוג מחיר
+        holder.deleteButton.setOnClickListener(view -> {
+            showSellPriceDialog(view.getContext(), stock.symbol);
+        });
+
         holder.itemView.setOnClickListener(view -> listener.onStockClick(stock.symbol));
     }
 
@@ -112,8 +120,24 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.StockViewH
             deleteButton = itemView.findViewById(R.id.btnDeleteStock);
         }
     }
+
     public void refreshPrices() {
         notifyDataSetChanged();
     }
 
+    // דיאלוג קלט למחיר סגירה
+    private void showSellPriceDialog(Context context, String symbol) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        builder.setTitle("הזן מחיר סגירה ל-" + symbol);
+        final EditText input = new EditText(context);
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        builder.setView(input);
+        builder.setPositiveButton("סגור טרייד", (dialog, which) -> {
+            String priceStr = input.getText().toString();
+            double sellPrice = priceStr.isEmpty() ? 0 : Double.parseDouble(priceStr);
+            listener.onStockDelete(symbol, sellPrice);
+        });
+        builder.setNegativeButton("ביטול", (dialog, which) -> dialog.cancel());
+        builder.show();
+    }
 }

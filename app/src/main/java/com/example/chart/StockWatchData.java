@@ -12,4 +12,29 @@ public class StockWatchData {
         this.currentPrice = currentPrice;
         this.dayChangePercent = dayChangePercent;
     }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public float getCurrentPrice() {
+        return currentPrice;
+    }
+
+    public float getDayChangePercent() {
+        return dayChangePercent;
+    }
+
+    // ניתן גם להוסיף setters אם צריך:
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
+    }
+
+    public void setCurrentPrice(float currentPrice) {
+        this.currentPrice = currentPrice;
+    }
+
+    public void setDayChangePercent(float dayChangePercent) {
+        this.dayChangePercent = dayChangePercent;
+    }
 }

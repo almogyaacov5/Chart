@@ -93,6 +93,8 @@
         android:layout_marginBottom="8dp"
         android:elevation="4dp" />
 
+
+
     <!-- גרף קווי -->
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/line_chart"

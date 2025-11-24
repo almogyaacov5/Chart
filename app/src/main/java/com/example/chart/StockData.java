@@ -5,6 +5,7 @@ public class StockData {
     public float buyPrice;
     public float currentPrice;
     public float changePercent; // שינוי יומי באחוזים
+    public double sellPrice;
 
     // קונסטרוקטור ריק בשביל Firebase
     public StockData() {}

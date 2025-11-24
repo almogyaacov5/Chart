@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton ;
+import android.widget.ImageButton;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -22,11 +22,12 @@ import java.util.List;
 public class PortfolioFragment extends Fragment {
 
     private RecyclerView recyclerView;
-    private ImageButton  btnRefreshPortfolio;
+    private ImageButton btnRefreshPortfolio;
     private Button btnAddStockToPortfolio;
     private List<StockData> stocksList;
     private StocksAdapter adapter;
     private DatabaseReference portfolioRef;
+    private DatabaseReference closedTradesRef;
 
     @Nullable
     @Override
@@ -40,13 +41,25 @@ public class PortfolioFragment extends Fragment {
 
         stocksList = new ArrayList<>();
         portfolioRef = FirebaseDatabase.getInstance().getReference("portfolio-stocks");
+        closedTradesRef = FirebaseDatabase.getInstance().getReference("closed-trades");
 
         adapter = new StocksAdapter(stocksList, new StocksAdapter.OnStockClickListener() {
             @Override
-            public void onStockClick(String symbol) {}
+            public void onStockClick(String symbol) {
+                // פעולה נוספת - כניסה לגרף/פרטים (אופציונלי)
+            }
+
             @Override
-            public void onStockDelete(String symbol) {
-                portfolioRef.child(symbol).removeValue();
+            public void onStockDelete(String symbol, double sellPrice) {
+                // קבלת הדאטה מהפורטפוליו, עדכון מחיר סגירה והעברה לרשומת טריידים סגורים
+                portfolioRef.child(symbol).get().addOnSuccessListener(snapshot -> {
+                    if (snapshot.exists()) {
+                        StockData data = snapshot.getValue(StockData.class);
+                        data.sellPrice = sellPrice; // עדכון במחיר סגירה מהמשתמש
+                        closedTradesRef.child(symbol).setValue(data);
+                        portfolioRef.child(symbol).removeValue();
+                    }
+                });
             }
         });
 

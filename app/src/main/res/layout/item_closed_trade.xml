@@ -1,0 +1,39 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="#FFFFFF">
+
+    <TextView
+        android:id="@+id/tradeSymbolText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SYMBOL"
+        android:textSize="18sp"
+        android:textColor="#1976D2"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/tradeCurrentPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Current Price: 0.00"
+        android:textSize="15sp"
+        android:textColor="#343A40"/>
+    <TextView
+        android:id="@+id/tradeSellingPrice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sell Price: 0.00"
+        android:textSize="15sp"
+        android:textColor="#343A40"/>
+    <TextView
+        android:id="@+id/tradeChangePercent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Change: 0.00%"
+        android:textSize="15sp"
+        android:textColor="#4CAF50"/>
+</LinearLayout>

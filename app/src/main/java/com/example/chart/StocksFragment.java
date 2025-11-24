@@ -168,7 +168,7 @@ public class StocksFragment extends Fragment implements StocksAdapter.OnStockCli
     }
 
     @Override
-    public void onStockDelete(String symbol) {
+    public void onStockDelete(String symbol, double sellPrice) {
         stocksRef.child(symbol).removeValue();
         Toast.makeText(getContext(), "המניה הוסרה מהרשימה", Toast.LENGTH_SHORT).show();
     }

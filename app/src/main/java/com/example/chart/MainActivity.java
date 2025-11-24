@@ -75,6 +75,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else if (id == R.id.nav_portfolio) {
             selectedFragment = new PortfolioFragment();
             title = "Portfolio";
+        }else if (id == R.id.nav_closed_trades) {
+            selectedFragment = new ClosedTradesFragment();
+            title = "Closed Trades";
         }
 
         if (selectedFragment != null) {
