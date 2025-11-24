@@ -53,7 +53,6 @@ public class ClosedTradesFragment extends Fragment {
                 Toast.makeText(getContext(), "שגיאה בטעינת הטריידים הסגורים", Toast.LENGTH_SHORT).show();
             }
         });
-
         return v;
     }
 }

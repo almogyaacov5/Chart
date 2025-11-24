@@ -1,39 +1,133 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="12dp"
-    android:background="#FFFFFF">
+<!--<com.google.android.material.card.MaterialCardView-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="wrap_content"-->
+<!--    android:layout_margin="14dp"-->
+<!--    app:cardElevation="3dp"-->
+<!--    app:strokeWidth="2dp"-->
+<!--    android:id="@+id/tradeCard"-->
+<!--    android:background="#00000000"-->
+<!--    android:layoutDirection="ltr"-->
+<!--    android:textDirection="ltr">-->
 
-    <TextView
-        android:id="@+id/tradeSymbolText"
-        android:layout_width="wrap_content"
+<com.google.android.material.card.MaterialCardView
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="SYMBOL"
-        android:textSize="18sp"
-        android:textColor="#1976D2"
-        android:textStyle="bold"/>
+        android:layout_margin="12dp"
+        app:cardElevation="4dp"
+        app:strokeWidth="2dp"
+        app:strokeColor="#2196F3"
+        app:cardCornerRadius="15dp"
+        android:background="#FFF">
 
-    <TextView
-        android:id="@+id/tradeCurrentPrice"
-        android:layout_width="wrap_content"
+
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="18dp"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Current Price: 0.00"
-        android:textSize="15sp"
-        android:textColor="#343A40"/>
-    <TextView
-        android:id="@+id/tradeSellingPrice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Sell Price: 0.00"
-        android:textSize="15sp"
-        android:textColor="#343A40"/>
-    <TextView
-        android:id="@+id/tradeChangePercent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Change: 0.00%"
-        android:textSize="15sp"
-        android:textColor="#4CAF50"/>
-</LinearLayout>
+        android:layoutDirection="ltr"
+        android:textDirection="ltr">
+
+
+        <!-- Symbol -->
+        <TextView
+            android:id="@+id/tradeSymbolText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SYMBOL"
+            android:textSize="21sp"
+            android:textStyle="bold"
+            android:textColor="#1A237E"
+            android:layout_marginBottom="5dp"
+            android:layoutDirection="ltr"
+            android:textDirection="ltr"/>
+
+        <!-- P&L and percent change box -->
+        <LinearLayout
+            android:id="@+id/resultBox"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="12dp"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="10dp"
+            android:layout_marginTop="5dp"
+            android:layoutDirection="ltr"
+            android:textDirection="ltr">
+
+            <TextView
+                android:id="@+id/pnlView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="P&amp;L: $0.00"
+                android:textSize="19sp"
+                android:textColor="#D32F2F"
+                android:textStyle="bold"
+                android:layout_marginEnd="12dp"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr"/>
+
+            <TextView
+                android:id="@+id/tradeChangePercent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0.00%"
+                android:textSize="15sp"
+                android:textColor="#222"
+                android:paddingLeft="10dp"
+                android:paddingRight="10dp"
+                android:textStyle="bold"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr"/>
+        </LinearLayout>
+
+        <!-- Trade details -->
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:layout_marginBottom="6dp"
+            android:layoutDirection="ltr"
+            android:textDirection="ltr">
+
+            <TextView
+                android:id="@+id/tradeBuyPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Entry: \n0.00"
+                android:textSize="15sp"
+                android:textColor="#222"
+                android:layout_weight="1"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr"/>
+
+            <TextView
+                android:id="@+id/tradeSellingPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Exit\n0.00"
+                android:textSize="15sp"
+                android:textColor="#222"
+                android:layout_weight="1"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr"/>
+
+            <TextView
+                android:id="@+id/tradeCurrentPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Current\n0.00"
+                android:textSize="15sp"
+                android:textColor="#222"
+                android:layout_weight="1"
+                android:layoutDirection="ltr"
+                android:textDirection="ltr"/>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

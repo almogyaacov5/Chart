@@ -39,20 +39,21 @@ public class ClosedTradesAdapter extends RecyclerView.Adapter<ClosedTradesAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         StockData trade = closedTrades.get(position);
         holder.symbolText.setText(trade.symbol);
-        holder.sellPriceView.setText("מחיר מכירה: " + trade.sellPrice);
+        holder.sellPriceView.setText("Exit Price:\n" + trade.sellPrice);
 
         fetchCurrentPrice(trade.symbol, new PriceCallback() {
             @Override
             public void onPriceReceived(float price) {
-                holder.priceText.post(() -> holder.priceText.setText("מחיר נוכחי: " + price));
+                holder.priceText.post(() -> holder.priceText.setText("Current Price:\n " + price));
                 float percentChange = (trade.sellPrice != 0f) ? ((price - (float)trade.sellPrice) / (float)trade.sellPrice * 100f) : 0f;
                 holder.percentText.post(() ->
-                        holder.percentText.setText("שינוי יומי: " + String.format("%.2f", percentChange) + "%"));
+                        holder.percentText.setText("Change From Selling:\n " + String.format("%.2f", percentChange) + "%"));
+
             }
             @Override
             public void onError(Exception e) {
                 holder.priceText.post(() -> holder.priceText.setText("שגיאה"));
-                holder.percentText.post(() -> holder.percentText.setText("שינוי יומי: ?"));
+                holder.percentText.post(() -> holder.percentText.setText("Change From Selling:?"));
             }
         });
     }
