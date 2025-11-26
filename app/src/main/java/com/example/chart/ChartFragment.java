@@ -47,12 +47,12 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
     private CandleStickChart candleStickChart;
     private LineChart lineChart;
     private EditText tickerInput;
-    private Button btnLoad, btnTimeFrame, btnToggleChart;
+    private Button btnLoad, btnTimeFrame,btnToggleChart;
     private ImageButton btnChartRefresh;
-    private TextView priceText, changeText, timeFrameText, tickerText;
+    private TextView timeFrameText, tickerText,priceText, changeText;
     private final OkHttpClient client = new OkHttpClient();
     private final String API_KEY = "0518811f0d394fa39842a8024a25c049";
-    private String symbol = "SPY";
+    private String symbol = "GRNY";
     private String interval = "1day";
     private boolean isCandleStick = true;
 
@@ -84,8 +84,8 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
             getActivity().setTitle("Chart: " + symbol);
         }
 
-        timeFrameText.setText("Time frame: " + interval);
-        tickerText.setText("Ticker: " + symbol);
+//        timeFrameText.setText("Time frame: " + interval);
+//        tickerText.setText("Ticker: " + symbol);
 
         candleStickChart.setVisibility(View.VISIBLE);
         lineChart.setVisibility(View.GONE);
@@ -151,12 +151,14 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
     }
 
     private void fetchStockData(String symbol, String interval) {
-        String url = "https://api.twelvedata.com/time_series?symbol=" + symbol +
-                "&interval=" + interval + "&apikey=" + API_KEY + "&outputsize=40";
+
+
+       String url = "https://api.twelvedata.com/time_series?symbol=" + symbol +
+               "&interval=" + interval + "&apikey=" + API_KEY + "&outputsize=40";
 
         Request request = new Request.Builder().url(url).build();
         client.newCall(request).enqueue(new Callback() {
-            @Override
+           @Override
             public void onFailure(Call call, IOException e) { }
 
             @Override
@@ -193,8 +195,7 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
                                 updateLineChart(candleEntries);
                             }
                             priceText.setText("Current price: " + dispClose);
-                            changeText.setText("Daily change: " + String.format("%.2f", dispChange) +
-                                    " (" + String.format("%.2f", dispChangePercent) + "%)");
+                            changeText.setText("Daily change: " + String.format("%.2f", dispChange) + " (" + String.format("%.2f", dispChangePercent) + "%)");
                             timeFrameText.setText("Time frame: " + interval);
                             tickerText.setText("Ticker: " + currentSymbol);
                         });
@@ -206,36 +207,6 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         });
     }
 
-//    private void updateChart(List<CandleEntry> entries) {
-//        CandleDataSet dataSet = new CandleDataSet(entries, "Price");
-//        dataSet.setColor(Color.rgb(80, 80, 80));
-//        dataSet.setShadowColor(Color.DKGRAY);
-//        dataSet.setShadowWidth(0.8f);
-//        dataSet.setDecreasingColor(Color.RED);
-//        dataSet.setDecreasingPaintStyle(Paint.Style.FILL);
-//        dataSet.setIncreasingColor(Color.GREEN);
-//        dataSet.setIncreasingPaintStyle(Paint.Style.FILL);
-//        dataSet.setNeutralColor(Color.BLUE); // צבע לנרות בלי שינוי
-//        dataSet.setDrawValues(false); // לא להציג ערכים על גרף
-//
-//        CandleData candleData = new CandleData(dataSet);
-//        candleStickChart.setData(candleData);
-//
-//        candleStickChart.getDescription().setEnabled(false);
-//        candleStickChart.setPinchZoom(true);
-//        candleStickChart.setDrawGridBackground(false);
-//        candleStickChart.setHighlightPerDragEnabled(true);
-//
-//        XAxis xAxis = candleStickChart.getXAxis();
-//        xAxis.setPosition(XAxis.XAxisPosition.BOTTOM);
-//        xAxis.setDrawGridLines(false);
-//
-//        YAxis leftAxis = candleStickChart.getAxisLeft();
-//        leftAxis.setDrawGridLines(true);
-//        candleStickChart.getAxisRight().setEnabled(false);
-//
-//        candleStickChart.invalidate(); // מצייר את הגרף מחדש
-//    }
 
     private void updateChart(List<CandleEntry> entries) {
         CandleDataSet dataSet = new CandleDataSet(entries, "Stock candle chart");

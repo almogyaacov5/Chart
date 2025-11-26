@@ -52,7 +52,7 @@
                 android:layout_height="wrap_content"
                 android:text="Day Change: 0.00%"
                 android:textSize="15sp"
-                android:textColor="#388E3C"
+                android:textColor="#1A237E"
                 android:textAlignment="viewStart"
                 android:layout_marginTop="3dp"/>
         </LinearLayout>

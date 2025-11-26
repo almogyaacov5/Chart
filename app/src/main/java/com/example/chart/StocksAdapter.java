@@ -24,7 +24,7 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.StockViewH
 
     public interface OnStockClickListener {
         void onStockClick(String symbol);
-        void onStockDelete(String symbol, double sellPrice); // ← מעביר גם את מחיר הסגירה
+        void onStockDelete(String symbol, double sellPrice); //מעביר גם את מחיר הסגירה
     }
 
     private List<StockData> stocks;
