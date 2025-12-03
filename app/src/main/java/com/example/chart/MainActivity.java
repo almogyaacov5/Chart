@@ -30,32 +30,29 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
 
-        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this);//מאפשר לחיצה על הפרייגמנטים השונים
 
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                } else {
-                    setEnabled(false);
-                    MainActivity.super.onBackPressed();
-                }
-            }
-        });
+//        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+//            @Override
+//            public void handleOnBackPressed() {
+//                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
+//                    drawerLayout.closeDrawer(GravityCompat.START);
+//                } else {
+//                    setEnabled(false);
+//                    MainActivity.super.onBackPressed();
+//                }
+//            }
+//        });
 
         // מסך ברירת מחדל - גרף
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new ChartFragment())
-                    .commit();
-            navigationView.setCheckedItem(R.id.nav_chart);
-            setTitle("Chart");
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new PortfolioFragment()).commit();
+            navigationView.setCheckedItem(R.id.nav_portfolio);
+//            setTitle("Chart");
         }
     }
 
@@ -63,13 +60,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Fragment selectedFragment = null;
         String title = "";
-
         int id = item.getItemId();
+
         if (id == R.id.nav_chart) {
             selectedFragment = new ChartFragment();
             title = "Chart";
         } else if (id == R.id.nav_stocks) {
-            // כאן: רשימת מעקב! (My Stocks)
+            // רשימת מעקב (My Stocks)
             selectedFragment = new WatchlistFragment();
             title = "My Stocks";
         } else if (id == R.id.nav_portfolio) {
@@ -81,13 +78,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         if (selectedFragment != null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, selectedFragment)
-                    .commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
             setTitle(title);
         }
 
-        drawerLayout.closeDrawer(GravityCompat.START);
+        drawerLayout.closeDrawer(GravityCompat.START);//סגירה אוטומטית של ToolBar אחרי בחירת מסך
         return true;
     }
 

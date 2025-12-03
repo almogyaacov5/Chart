@@ -4,7 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Bundle;
-import android.util.Log;
+import android.provider.ContactsContract;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -84,11 +84,11 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
             getActivity().setTitle("Chart: " + symbol);
         }
 
+
 //        timeFrameText.setText("Time frame: " + interval);
 //        tickerText.setText("Ticker: " + symbol);
-
-        candleStickChart.setVisibility(View.VISIBLE);
-        lineChart.setVisibility(View.GONE);
+//        candleStickChart.setVisibility(View.VISIBLE);
+//        lineChart.setVisibility(View.GONE);
 
         // מאזין ללחיצה על כפתור טעינת הסימבול
         btnLoad.setOnClickListener(v1 -> {
@@ -108,7 +108,7 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         // מאזין ללחיצה על כפתור הריפרש - מוגדר בנפרד ומוכן לפעולה תמידית
         btnChartRefresh.setOnClickListener(v2 -> {
             fetchStockData(symbol, interval);
-            Toast.makeText(requireContext(), "Watchlist refreshed", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Chart refreshed", Toast.LENGTH_SHORT).show();
         });
 
         btnTimeFrame.setOnClickListener(v1 -> {
@@ -190,12 +190,12 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
                     if(getActivity()!=null) {
                         getActivity().runOnUiThread(() -> {
                             if (isCandleStick) {
-                                updateChart(candleEntries);
+                                updateCandleChart(candleEntries);
                             } else {
                                 updateLineChart(candleEntries);
                             }
                             priceText.setText("Current price: " + dispClose);
-                            changeText.setText("Daily change: " + String.format("%.2f", dispChange) + " (" + String.format("%.2f", dispChangePercent) + "%)");
+                            changeText.setText("Daily change: " + String.format("%.2f", dispChange) + "(" + String.format("%.2f", dispChangePercent) + "%)");
                             timeFrameText.setText("Time frame: " + interval);
                             tickerText.setText("Ticker: " + currentSymbol);
                         });
@@ -208,7 +208,7 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
     }
 
 
-    private void updateChart(List<CandleEntry> entries) {
+    private void updateCandleChart(List<CandleEntry> entries) {
         CandleDataSet dataSet = new CandleDataSet(entries, "Stock candle chart");
         dataSet.setDecreasingColor(Color.RED);
         dataSet.setIncreasingColor(Color.GREEN);
@@ -219,15 +219,17 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         dataSet.setShadowColor(Color.DKGRAY);
         dataSet.setDrawValues(false);
 
+        XAxis xAxis = candleStickChart.getXAxis();
+        YAxis leftAxis = candleStickChart.getAxisLeft();
+        YAxis rightAxis = candleStickChart.getAxisRight();
+        xAxis.setDrawGridLines(false);
+        leftAxis.setDrawGridLines(false);
+        rightAxis.setDrawGridLines(false);
+
         CandleData data = new CandleData(dataSet);
         candleStickChart.setData(data);
         candleStickChart.invalidate(); // מצייר את הגרף מחדש
     }
-
-
-
-
-
         private void updateLineChart(List<CandleEntry> candleEntries) {
         List<Entry> lineEntries = new ArrayList<>();
         for (CandleEntry c : candleEntries) {
@@ -236,9 +238,16 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
 
         LineDataSet lineDataSet = new LineDataSet(lineEntries, "Line chart");
         lineDataSet.setColor(Color.BLUE);
-        lineDataSet.setLineWidth(2f);
+        //lineDataSet.setLineWidth(2f);
         lineDataSet.setDrawCircles(false);
         lineDataSet.setDrawValues(false);
+
+//        XAxis xAxis = lineChart.getXAxis();
+//        YAxis leftAxis = lineChart.getAxisLeft();
+//        YAxis rightAxis = lineChart.getAxisRight();
+//        xAxis.setDrawGridLines(true);
+//        leftAxis.setDrawGridLines(true);
+//        rightAxis.setDrawGridLines(true);
 
         LineData lineData = new LineData(lineDataSet);
         lineChart.setData(lineData);
