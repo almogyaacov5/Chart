@@ -26,20 +26,45 @@ public class LLMService {
         void onError(String error);
     }
 
-    public void analyzeStock(String symbol, List<Float> closes, Context context, AnalysisCallback callback) {
-        if (closes == null || closes.size() < 2) {
-            callback.onError("נתונים לא מספיקים (צריך לפחות 2 נקודות)");
-            return;
-        }
+    // 🔥 פונקציה ראשית - ניתוח אוטומטי
+//    public void analyzeStock(String symbol, List<Float> closes, Context context, AnalysisCallback callback) {
+//        if (closes == null || closes.size() < 2) {
+//            callback.onError("נתונים לא מספיקים (צריך לפחות 2 נקודות)");
+//            return;
+//        }
+//
+//        String prompt = buildTradingPrompt(symbol, closes);
+//        Log.d("LLMService", "Prompt: " + prompt.substring(0, Math.min(200, prompt.length())));
+//
+//        if (prompt.trim().isEmpty()) {
+//            callback.onError("פרומפט ריק");
+//            return;
+//        }
+//
+//        sendToPerplexity(prompt, callback);
+//    }
 
-        String prompt = buildTradingPrompt(symbol, closes);
-        Log.d("LLMService", "Prompt: " + prompt.substring(0, Math.min(200, prompt.length())));
+    // 🔥 פונקציה חדשה - שאלות מותאמות אישית
+    public void askQuestion(String symbol, String question, String context,
+                            List<Float> closes, AnalysisCallback callback) {
+        String prompt = String.format(
+                "🚨 **שאלה על %s**\n\n" +
+                        "שאלה: %s\n\n" +
+                        "הקשר: %s\n" +
+                        "נתוני מחירים אחרונים: %s\n\n" +
+                        "**ענה בעברית בלבד, תמציתי ומקצועי:**",
+                symbol, question, context,
+                closes.size() > 5 ?
+                        String.join(", ", closes.subList(0, 5).stream()
+                                .map(c -> df.format(c))
+                                .toArray(String[]::new)) : "לא זמין"
+        );
 
-        if (prompt.trim().isEmpty()) {
-            callback.onError("פרומפט ריק");
-            return;
-        }
+        sendToPerplexity(prompt, callback);
+    }
 
+    // 🔥 פונקציה פנימית משותפת - שולחת ל-API
+    private void sendToPerplexity(String prompt, AnalysisCallback callback) {
         JSONObject requestBody = new JSONObject();
         try {
             requestBody.put("model", "sonar-pro");
@@ -48,7 +73,7 @@ public class LLMService {
                             .put("role", "user")
                             .put("content", prompt)
             ));
-            requestBody.put("max_tokens", 800);
+            requestBody.put("max_tokens", 1000);
             requestBody.put("temperature", 0.1);
             requestBody.put("stream", false);
         } catch (Exception e) {
@@ -109,13 +134,13 @@ public class LLMService {
         });
     }
 
-    // 🔥 פרומפט מלא ומסודר - רשימה בדיוק!
-    private String buildTradingPrompt(String symbol, List<Float> closes) {
-        float currentPrice = closes.get(0);
-        float change1d = closes.size() > 1 ?
-                ((closes.get(0) - closes.get(1)) / closes.get(1)) * 100 : 0;
-
-        return String.format(symbol+"רשום לי שיר בעל 4 שורות על המניה");
+    // 🔥 פרומפט מסחרי אוטומטי
+//    private String buildTradingPrompt(String symbol, List<Float> closes) {
+//        float currentPrice = closes.get(0);
+//        float change1d = closes.size() > 1 ?
+//                ((closes.get(0) - closes.get(1)) / closes.get(1)) * 100 : 0;
+//
+//        return String.format(""
 //                "🚨 **%s - מחיר נוכחי: $%.2f** 🚨\n\n" +
 //                        "נתונים:\n" +
 //                        "• שינוי יומי: %.1f%%\n" +
@@ -135,5 +160,5 @@ public class LLMService {
 //                currentPrice * 1.08f,  // TP1 +8%
 //                currentPrice * 1.15f   // TP2 +15%
 //        );
-    }
+//    }
 }
