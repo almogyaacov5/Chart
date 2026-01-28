@@ -90,7 +90,7 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         tickerText = v.findViewById(R.id.tickerText);
         currentPriceDisplay = v.findViewById(R.id.currentPriceDisplay);
 
-        llmService = new LLMService();
+        llmService = new LLMService(getContext());
         if (progressAI != null) progressAI.setVisibility(View.GONE);
         if (currentPriceDisplay != null) currentPriceDisplay.setVisibility(View.GONE);
 

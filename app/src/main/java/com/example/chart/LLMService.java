@@ -7,7 +7,14 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import okhttp3.*;
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,35 +23,56 @@ import java.text.DecimalFormat;
 import java.util.List;
 
 public class LLMService {
+
     private static final String PERPLEXITY_API_URL = "https://api.perplexity.ai/chat/completions";
+    // וודא שהמפתח כאן הוא המפתח הנכון והמעודכן שלך
     private static final String API_KEY = "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";
+
     private final OkHttpClient client = new OkHttpClient();
     private final DecimalFormat df = new DecimalFormat("#.##");
+    private Context context;
 
+    // --- בנאי (Constructor) ---
+    public LLMService(Context context) {
+        this.context = context;
+    }
+
+    // --- ממשקים (Callbacks) ---
+
+    // ממשק ישן (לשימוש פנימי או במקומות אחרים)
     public interface AnalysisCallback {
         void onAnalysisReceived(String analysis);
         void onError(String error);
     }
 
-    // 🔥 פונקציה ראשית - ניתוח אוטומטי
-//    public void analyzeStock(String symbol, List<Float> closes, Context context, AnalysisCallback callback) {
-//        if (closes == null || closes.size() < 2) {
-//            callback.onError("נתונים לא מספיקים (צריך לפחות 2 נקודות)");
-//            return;
-//        }
-//
-//        String prompt = buildTradingPrompt(symbol, closes);
-//        Log.d("LLMService", "Prompt: " + prompt.substring(0, Math.min(200, prompt.length())));
-//
-//        if (prompt.trim().isEmpty()) {
-//            callback.onError("פרומפט ריק");
-//            return;
-//        }
-//
-//        sendToPerplexity(prompt, callback);
-//    }
+    // ממשק חדש ונוח לשימוש בפרגמנטים
+    public interface LLMCallback {
+        void onSuccess(String result);
+        void onFailure(Throwable t);
+    }
 
-    // 🔥 פונקציה חדשה - שאלות מותאמות אישית
+    // --- פונקציות ציבוריות ---
+
+    /**
+     * פונקציה גנרית לשליחת כל טקסט ל-AI וקבלת תשובה.
+     * מתאימה לניתוח תיק, המלצות, וסיכומים.
+     */
+    public void generateContent(String prompt, LLMCallback callback) {
+        // המרה ל-Callback הפנימי
+        sendToPerplexity(prompt, new AnalysisCallback() {
+            @Override
+            public void onAnalysisReceived(String analysis) {
+                callback.onSuccess(analysis);
+            }
+
+            @Override
+            public void onError(String error) {
+                callback.onFailure(new Exception(error));
+            }
+        });
+    }
+
+    // פונקציה לשאלות ספציפיות על מניה (מהקוד המקורי שלך)
     public void askQuestion(String symbol, String question, String context,
                             List<Float> closes, AnalysisCallback callback) {
         String prompt = String.format(
@@ -54,27 +82,27 @@ public class LLMService {
                         "נתוני מחירים אחרונים: %s\n\n" +
                         "**ענה בעברית בלבד, תמציתי ומקצועי:**",
                 symbol, question, context,
-                closes.size() > 5 ?
+                (closes != null && closes.size() > 5) ?
                         String.join(", ", closes.subList(0, 5).stream()
                                 .map(c -> df.format(c))
                                 .toArray(String[]::new)) : "לא זמין"
         );
-
         sendToPerplexity(prompt, callback);
     }
 
-    // 🔥 פונקציה פנימית משותפת - שולחת ל-API
+    // --- פונקציות פרטיות ---
+
     private void sendToPerplexity(String prompt, AnalysisCallback callback) {
         JSONObject requestBody = new JSONObject();
         try {
-            requestBody.put("model", "sonar-pro");
+            requestBody.put("model", "sonar-pro"); // מודל חכם לניתוח פיננסי
             requestBody.put("messages", new JSONArray().put(
                     new JSONObject()
                             .put("role", "user")
                             .put("content", prompt)
             ));
-            requestBody.put("max_tokens", 1000);
-            requestBody.put("temperature", 0.1);
+            requestBody.put("max_tokens", 1000); // מספיק מקום לתשובה מפורטת
+            requestBody.put("temperature", 0.2); // יצירתיות נמוכה לטובת דיוק
             requestBody.put("stream", false);
         } catch (Exception e) {
             callback.onError("שגיאה בבניית JSON: " + e.getMessage());
@@ -103,8 +131,6 @@ public class LLMService {
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 try {
                     String responseBody = response.body().string();
-                    Log.d("LLMService", "Status: " + response.code() + " | Response: " + responseBody.substring(0, 200));
-
                     if (!response.isSuccessful()) {
                         runOnUiThread(callback, "API Error " + response.code() + ": " + responseBody);
                         return;
@@ -117,6 +143,7 @@ public class LLMService {
                             .getString("content");
 
                     runOnUiThread(callback, analysis.trim());
+
                 } catch (Exception e) {
                     runOnUiThread(callback, "שגיאת תגובה: " + e.getMessage());
                 }
@@ -133,32 +160,4 @@ public class LLMService {
             }
         });
     }
-
-    // 🔥 פרומפט מסחרי אוטומטי
-//    private String buildTradingPrompt(String symbol, List<Float> closes) {
-//        float currentPrice = closes.get(0);
-//        float change1d = closes.size() > 1 ?
-//                ((closes.get(0) - closes.get(1)) / closes.get(1)) * 100 : 0;
-//
-//        return String.format(""
-//                "🚨 **%s - מחיר נוכחי: $%.2f** 🚨\n\n" +
-//                        "נתונים:\n" +
-//                        "• שינוי יומי: %.1f%%\n" +
-//                        "• מספר נקודות: %d\n\n" +
-//                        "**תענה בדיוק ברשימה הזו בלבד:**\n\n" +
-//                        "🎯 **המלצה:** קנה / מכור / המתן\n" +
-//                        "📊 **סיבה 1:** ...\n" +
-//                        "📊 **סיבה 2:** ...\n" +
-//                        "📊 **סיבה 3:** ...\n" +
-//                        "🛑 **Stop Loss:** $%.2f\n" +
-//                        "💰 **Take Profit 1:** $%.2f\n" +
-//                        "💎 **Take Profit 2:** $%.2f\n" +
-//                        "⚠️ **רמת סיכון:** נמוכה / בינונית / גבוהה\n\n" +
-//                        "**רק הרשימה! ללא טקסט נוסף! עברית בלבד!**",
-//                symbol, currentPrice, change1d, closes.size(),
-//                currentPrice * 0.95f,  // Stop Loss -5%
-//                currentPrice * 1.08f,  // TP1 +8%
-//                currentPrice * 1.15f   // TP2 +15%
-//        );
-//    }
 }
