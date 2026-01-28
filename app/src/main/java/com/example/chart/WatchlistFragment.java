@@ -1,11 +1,13 @@
 package com.example.chart;
 
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,11 +16,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,10 +33,21 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
     private DatabaseReference watchlistRef;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater,
+                             @Nullable ViewGroup container,
+                             @Nullable Bundle savedInstanceState) {
+
         View v = inflater.inflate(R.layout.fragment_watchlist, container, false);
 
-        watchlistRef = FirebaseDatabase.getInstance().getReference("watchlist-stocks");
+        // uid של המשתמש המחובר
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        // נתיב watchlist לפי משתמש
+        watchlistRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(uid)
+                .child("watchlist-stocks");
+
         watchlist = new ArrayList<>();
         adapter = new WatchlistAdapter(watchlist, this);
 
@@ -64,19 +79,23 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
                 watchlist.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     StockWatchData data = ds.getValue(StockWatchData.class);
-                    if (data != null) watchlist.add(data);
+                    if (data != null) {
+                        watchlist.add(data);
+                    }
                 }
                 adapter.notifyDataSetChanged();
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(), "שגיאה בטעינת רשימת המעקב", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(),
+                        "שגיאה בטעינת רשימת המעקב",
+                        Toast.LENGTH_SHORT).show();
             }
         });
 
         return v;
     }
-
 
     @Override
     public void onStockClick(String symbol) {
@@ -91,10 +110,9 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
                 .commit();
     }
 
-
     @Override
     public void onStockDelete(String symbol) {
         watchlistRef.child(symbol).removeValue();
-        Toast.makeText(getContext(), "המניה הוסרה", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "Stock Removed", Toast.LENGTH_SHORT).show();
     }
 }

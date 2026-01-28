@@ -158,6 +158,40 @@
             android:text="Line chart"
             android:textColor="#FFFFFF" />
 
+        <Button
+            android:id="@+id/btnAIAnalysis"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🤖 ניתוח AI"
+            android:layout_below="@id/btnToggleChart"
+            android:layout_marginTop="8dp" />
+
+        <ProgressBar
+            android:id="@+id/progressAI"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/currentPriceDisplay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="💰 מחיר נוכחי: $0.00"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#FFD700"
+            android:background="#80000000"
+            android:padding="12dp"
+            android:layout_margin="16dp"
+            android:visibility="gone" />
+
+
+
+
+
+
+
+
     </LinearLayout>
 
     <!-- כיתוב תקופת זמן -->
@@ -172,6 +206,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="12dp"/>
+
+
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

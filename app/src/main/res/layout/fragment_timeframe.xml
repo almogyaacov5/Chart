@@ -9,9 +9,28 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <RadioButton android:id="@+id/radio1min" android:text="1min" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <RadioButton android:id="@+id/radio5min" android:text="5min" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <RadioButton android:id="@+id/radio15min" android:text="15min" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-        <RadioButton android:id="@+id/radio1day" android:text="1day" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        <RadioButton
+            android:id="@+id/radio1min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1min" />
+
+        <RadioButton
+            android:id="@+id/radio5min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5min" />
+
+        <RadioButton
+            android:id="@+id/radio15min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="15min" />
+
+        <RadioButton
+            android:id="@+id/radio1day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="1day" />
     </RadioGroup>
 </LinearLayout>

@@ -5,13 +5,11 @@ plugins {
 
 android {
     namespace = "com.example.chart"
-    compileSdk {
-        version = release(36)
-    }
+    compileSdk = 36  // <--- שנה כאן
 
     defaultConfig {
         applicationId = "com.example.chart"
-        minSdk = 29
+        minSdk = 29  // <--- שנה גם כאן אם צריך
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
@@ -46,11 +44,16 @@ dependencies {
     implementation(libs.recyclerview)
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services.auth)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
-    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("androidx.cardview:cardview:1.0.0")
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation("androidx.biometric:biometric:1.2.0-alpha05")
+    implementation("com.google.firebase:firebase-database:20.3.0")
 }
