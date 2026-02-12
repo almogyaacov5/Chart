@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -29,7 +30,6 @@ public class PortfolioFragment extends Fragment {
     private RecyclerView recyclerView;
     private ImageButton btnRefreshPortfolio;
     private Button btnAddStockToPortfolio;
-    // הגדרת משתנה לכפתור ההתנתקות
     private Button btnLogout;
 
     private List<StockData> stocksList;
@@ -48,15 +48,19 @@ public class PortfolioFragment extends Fragment {
         recyclerView = v.findViewById(R.id.tradesRecyclerView);
         btnAddStockToPortfolio = v.findViewById(R.id.btnAddStockToPortfolio);
         btnRefreshPortfolio = v.findViewById(R.id.btnRefreshPortfolio);
-        // קישור הכפתור מה-XML
         btnLogout = v.findViewById(R.id.btnLogout);
 
         stocksList = new ArrayList<>();
 
-        // uid של המשתמש המחובר
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        // הגנה: אם אין משתמש מחובר (currentUser == null) אל תנסה getUid() כדי למנוע קריסה
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            goToLogin();
+            return v;
+        }
 
-        // נתיבים לפי משתמש
+        String uid = user.getUid();
+
         portfolioRef = FirebaseDatabase.getInstance()
                 .getReference("users")
                 .child(uid)
@@ -75,7 +79,6 @@ public class PortfolioFragment extends Fragment {
 
             @Override
             public void onStockDelete(String symbol, double sellPrice) {
-                // קבלת הדאטה מהפורטפוליו, עדכון מחיר סגירה והעברה לטריידים סגורים
                 portfolioRef.child(symbol).get().addOnSuccessListener(snapshot -> {
                     if (snapshot.exists()) {
                         StockData data = snapshot.getValue(StockData.class);
@@ -89,7 +92,7 @@ public class PortfolioFragment extends Fragment {
             }
         });
 
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
         recyclerView.setAdapter(adapter);
 
         portfolioRef.addValueEventListener(new ValueEventListener() {
@@ -106,7 +109,7 @@ public class PortfolioFragment extends Fragment {
             }
 
             @Override
-            public void onCancelled(@NonNull DatabaseError error) {}
+            public void onCancelled(@NonNull DatabaseError error) { }
         });
 
         btnAddStockToPortfolio.setOnClickListener(view -> {
@@ -118,18 +121,18 @@ public class PortfolioFragment extends Fragment {
 
         btnRefreshPortfolio.setOnClickListener(view -> adapter.refreshPrices());
 
-        // הוספת מאזין לכפתור ההתנתקות
+        // מאזין יחיד להתנתקות (בלי כפילויות)
         btnLogout.setOnClickListener(view -> {
-            // התנתקות מ-Firebase
             FirebaseAuth.getInstance().signOut();
-
-            // חזרה למסך ההתחברות (AuthLogin)
-            Intent intent = new Intent(getActivity(), AuthLogin.class);
-            // מחיקת היסטוריית המסכים כדי למנוע חזרה לאפליקציה בלחיצה על Back
-            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-            startActivity(intent);
+            goToLogin();
         });
 
         return v;
+    }
+
+    private void goToLogin() {
+        Intent intent = new Intent(requireActivity(), AuthLogin.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

@@ -1,36 +1,96 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="24dp">
+    android:padding="20dp"
+    android:background="#F3F6FB">
 
-    <RadioGroup
-        android:id="@+id/radioGroupTimeframes"
+    <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:text="בחר טווח זמן"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#0F172A"
+        android:layout_marginBottom="10dp"/>
 
-        <RadioButton
-            android:id="@+id/radio1min"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1min" />
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="2dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#E2E8F0"
+        app:cardBackgroundColor="#FFFFFF">
 
-        <RadioButton
-            android:id="@+id/radio5min"
-            android:layout_width="wrap_content"
+        <RadioGroup
+            android:id="@+id/radioGroupTimeframes"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="5min" />
+            android:orientation="vertical"
+            android:padding="10dp">
 
-        <RadioButton
-            android:id="@+id/radio15min"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="15min" />
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/radio1min"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="1min"
+                android:textSize="15sp"
+                android:textColor="#0F172A"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                app:useMaterialThemeColors="true" />
 
-        <RadioButton
-            android:id="@+id/radio1day"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="1day" />
-    </RadioGroup>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EEF2F7" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/radio5min"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="5min"
+                android:textSize="15sp"
+                android:textColor="#0F172A"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                app:useMaterialThemeColors="true" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EEF2F7" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/radio15min"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="15min"
+                android:textSize="15sp"
+                android:textColor="#0F172A"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                app:useMaterialThemeColors="true" />
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#EEF2F7" />
+
+            <com.google.android.material.radiobutton.MaterialRadioButton
+                android:id="@+id/radio1day"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:text="1day"
+                android:textSize="15sp"
+                android:textColor="#0F172A"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="12dp"
+                app:useMaterialThemeColors="true" />
+
+        </RadioGroup>
+    </com.google.android.material.card.MaterialCardView>
+
 </LinearLayout>

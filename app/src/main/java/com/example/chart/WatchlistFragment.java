@@ -1,13 +1,11 @@
 package com.example.chart;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
-
+import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +14,13 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.google.firebase.auth.FirebaseAuth;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -33,21 +37,12 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
     private DatabaseReference watchlistRef;
 
     @Override
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_watchlist, container, false);
 
-        // uid של המשתמש המחובר
-        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        createNotificationChannel();
 
-        // נתיב watchlist לפי משתמש
-        watchlistRef = FirebaseDatabase.getInstance()
-                .getReference("users")
-                .child(uid)
-                .child("watchlist-stocks");
-
+        watchlistRef = FirebaseDatabase.getInstance().getReference("watchlist-stocks");
         watchlist = new ArrayList<>();
         adapter = new WatchlistAdapter(watchlist, this);
 
@@ -79,18 +74,14 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
                 watchlist.clear();
                 for (DataSnapshot ds : snapshot.getChildren()) {
                     StockWatchData data = ds.getValue(StockWatchData.class);
-                    if (data != null) {
-                        watchlist.add(data);
-                    }
+                    if (data != null) watchlist.add(data);
                 }
                 adapter.notifyDataSetChanged();
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(getContext(),
-                        "שגיאה בטעינת רשימת המעקב",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "שגיאה בטעינת רשימת המעקב", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -113,6 +104,62 @@ public class WatchlistFragment extends Fragment implements WatchlistAdapter.OnWa
     @Override
     public void onStockDelete(String symbol) {
         watchlistRef.child(symbol).removeValue();
-        Toast.makeText(getContext(), "Stock Removed", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(), "המניה הוסרה", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onSetPriceAlert(StockWatchData stock) {
+        if (getContext() == null) {
+            return;
+        }
+
+        final EditText input = new EditText(getContext());
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        if (stock.alertEnabled && stock.alertTargetPrice > 0f) {
+            input.setText(String.valueOf(stock.alertTargetPrice));
+        }
+
+        new AlertDialog.Builder(requireContext())
+                .setTitle("Set price alert for " + stock.symbol)
+                .setMessage("Enter target price. Notification will fire when price crosses above it.")
+                .setView(input)
+                .setPositiveButton("Save", (dialog, which) -> {
+                    String value = input.getText().toString().trim();
+                    try {
+                        float target = Float.parseFloat(value);
+                        watchlistRef.child(stock.symbol).child("alertTargetPrice").setValue(target);
+                        watchlistRef.child(stock.symbol).child("alertEnabled").setValue(true);
+                        watchlistRef.child(stock.symbol).child("alertTriggered").setValue(false);
+                        Toast.makeText(getContext(), "Price alert saved", Toast.LENGTH_SHORT).show();
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(getContext(), "Invalid number", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setNeutralButton("Disable", (dialog, which) -> {
+                    watchlistRef.child(stock.symbol).child("alertEnabled").setValue(false);
+                    watchlistRef.child(stock.symbol).child("alertTriggered").setValue(false);
+                    Toast.makeText(getContext(), "Price alert disabled", Toast.LENGTH_SHORT).show();
+                })
+                .setNegativeButton("Cancel", null)
+                .show();
+    }
+
+    @Override
+    public void onAlertStateChanged(String symbol, boolean triggered) {
+        watchlistRef.child(symbol).child("alertTriggered").setValue(triggered);
+    }
+
+    private void createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    WatchlistAdapter.ALERT_CHANNEL_ID,
+                    "Stock price alerts",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("Notifications when watchlist stocks cross your target price");
+
+            NotificationManager notificationManager = (NotificationManager) requireContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(channel);
+        }
     }
 }

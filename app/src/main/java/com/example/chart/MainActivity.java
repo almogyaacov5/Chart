@@ -1,16 +1,23 @@
 package com.example.chart;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
-import androidx.activity.OnBackPressedCallback;
+import android.view.MenuItem;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
+
 import com.google.android.material.navigation.NavigationView;
-import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -19,10 +26,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private NavigationView navigationView;
     private ActionBarDrawerToggle toggle;
 
+    private final ActivityResultLauncher<String> notificationPermissionLauncher =
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            });
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        requestNotificationPermissionIfNeeded();
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -30,32 +43,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawerLayout = findViewById(R.id.drawer_layout);
         navigationView = findViewById(R.id.nav_view);
 
-        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar,
-                R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        toggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this);//מאפשר לחיצה על הפרייגמנטים השונים
 
-        // מסך ברירת מחדל
+        // מסך ברירת מחדל - גרף
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new PortfolioFragment())
-                    .commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, new ChartFragment()).commit();
             navigationView.setCheckedItem(R.id.nav_chart);
         }
-
-        // טיפול בכפתור Back מודרני
-        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                if (drawerLayout.isDrawerOpen(GravityCompat.START)) {
-                    drawerLayout.closeDrawer(GravityCompat.START);
-                } else {
-                    finish();
-                }
-            }
-        });
     }
 
     @Override
@@ -68,6 +66,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             selectedFragment = new ChartFragment();
             title = "Chart";
         } else if (id == R.id.nav_stocks) {
+            // רשימת מעקב (My Stocks)
             selectedFragment = new WatchlistFragment();
             title = "My Stocks";
         } else if (id == R.id.nav_portfolio) {
@@ -79,26 +78,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
 
         if (selectedFragment != null) {
-            getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, selectedFragment)
-                    .commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
             setTitle(title);
         }
 
-        drawerLayout.closeDrawer(GravityCompat.START);
+        drawerLayout.closeDrawer(GravityCompat.START);//סגירה אוטומטית של ToolBar אחרי בחירת מסך
         return true;
-    }
-
-    public void navigateToClosedTrades() {
-        navigationView.setCheckedItem(R.id.nav_closed_trades);
-
-        ClosedTradesFragment fragment = new ClosedTradesFragment();
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit();
-
-        setTitle("Closed Trades");
-        drawerLayout.closeDrawer(GravityCompat.START);
     }
 
     public void showChartWithSymbol(String symbol) {
@@ -112,18 +97,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 .commit();
 
         navigationView.setCheckedItem(R.id.nav_chart);
-        setTitle("Chart - " + symbol);
     }
 
-    @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        toggle.syncState();
-    }
-
-    @Override
-    public void onConfigurationChanged(android.content.res.Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        toggle.onConfigurationChanged(newConfig);
+    private void requestNotificationPermissionIfNeeded() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                        != PackageManager.PERMISSION_GRANTED) {
+            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
+        }
     }
 }

@@ -1,15 +1,21 @@
 package com.example.chart;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.TextView;
+
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.RecyclerView;
+
 import java.io.IOException;
 import java.util.List;
+
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
@@ -21,9 +27,13 @@ public class WatchlistAdapter extends RecyclerView.Adapter<WatchlistAdapter.Watc
     public interface OnWatchStockClickListener {
         void onStockClick(String symbol);
         void onStockDelete(String symbol);
+        void onSetPriceAlert(StockWatchData stock);
+        void onAlertStateChanged(String symbol, boolean triggered);
     }
 
-    private List<StockWatchData> stocks;
+    public static final String ALERT_CHANNEL_ID = "stock_alert_channel";
+
+    private final List<StockWatchData> stocks;
     private final OnWatchStockClickListener listener;
     private final OkHttpClient httpClient = new OkHttpClient();
     private final String API_KEY = "0518811f0d394fa39842a8024a25c049";
@@ -44,13 +54,16 @@ public class WatchlistAdapter extends RecyclerView.Adapter<WatchlistAdapter.Watc
     public void onBindViewHolder(@NonNull WatchViewHolder holder, int position) {
         StockWatchData stock = stocks.get(position);
         holder.symbolText.setText(stock.symbol);
+        updateAlertText(holder, stock);
 
         fetchStockData(stock.symbol, "1day", new StockDataCallback() {
             @Override
             public void onDataReceived(float price, float dayChange) {
                 holder.priceText.post(() -> holder.priceText.setText("Stock Price: " + price));
                 holder.dayChangeText.post(() -> holder.dayChangeText.setText("Day Change: " + String.format("%.2f", dayChange) + "%"));
+                processAlert(stock, price, holder.itemView.getContext());
             }
+
             @Override
             public void onError(Exception e) {
                 holder.priceText.post(() -> holder.priceText.setText("Stock Price: ?"));
@@ -60,6 +73,7 @@ public class WatchlistAdapter extends RecyclerView.Adapter<WatchlistAdapter.Watc
 
         holder.itemView.setOnClickListener(view -> listener.onStockClick(stock.symbol));
         holder.deleteButton.setOnClickListener(view -> listener.onStockDelete(stock.symbol));
+        holder.alertButton.setOnClickListener(view -> listener.onSetPriceAlert(stock));
     }
 
     @Override
@@ -67,16 +81,56 @@ public class WatchlistAdapter extends RecyclerView.Adapter<WatchlistAdapter.Watc
         return stocks != null ? stocks.size() : 0;
     }
 
+    private void updateAlertText(WatchViewHolder holder, StockWatchData stock) {
+        if (stock.alertEnabled && stock.alertTargetPrice > 0f) {
+            holder.alertText.setText("Price Alert: " + stock.alertTargetPrice);
+        } else {
+            holder.alertText.setText("Price Alert: Off");
+        }
+    }
+
+    private void processAlert(StockWatchData stock, float currentPrice, Context context) {
+        if (!stock.alertEnabled || stock.alertTargetPrice <= 0f) {
+            return;
+        }
+
+        if (currentPrice >= stock.alertTargetPrice && !stock.alertTriggered) {
+            showPriceAlertNotification(context, stock.symbol, stock.alertTargetPrice, currentPrice);
+            stock.alertTriggered = true;
+            listener.onAlertStateChanged(stock.symbol, true);
+        } else if (currentPrice < stock.alertTargetPrice && stock.alertTriggered) {
+            stock.alertTriggered = false;
+            listener.onAlertStateChanged(stock.symbol, false);
+        }
+    }
+
+    private void showPriceAlertNotification(Context context, String symbol, float targetPrice, float currentPrice) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, ALERT_CHANNEL_ID)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
+                .setContentTitle("Stock Alert: " + symbol)
+                .setContentText("Price crossed " + targetPrice + " (now " + currentPrice + ")")
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setAutoCancel(true);
+
+        NotificationManagerCompat manager = NotificationManagerCompat.from(context);
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU ||
+                context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+            manager.notify(symbol.hashCode(), builder.build());
+        }
+    }
+
     static class WatchViewHolder extends RecyclerView.ViewHolder {
-        TextView symbolText, priceText, dayChangeText;
-        ImageButton deleteButton;
+        TextView symbolText, priceText, dayChangeText, alertText;
+        ImageButton deleteButton, alertButton;
 
         public WatchViewHolder(@NonNull View itemView) {
             super(itemView);
             symbolText = itemView.findViewById(R.id.stockSymbolText);
             priceText = itemView.findViewById(R.id.stockPriceText);
             dayChangeText = itemView.findViewById(R.id.stockDayChangeText);
+            alertText = itemView.findViewById(R.id.stockAlertText);
             deleteButton = itemView.findViewById(R.id.btnDeleteStock);
+            alertButton = itemView.findViewById(R.id.btnSetAlert);
         }
     }
 

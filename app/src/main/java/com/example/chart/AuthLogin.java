@@ -32,6 +32,7 @@ public class AuthLogin extends AppCompatActivity {
     private EditText editTextEmailAddress, editTextPassword;
     private Button button;
     private Button btnBiometricLogin;
+    private Button btnNoUser; // חדש: אין לי משתמש
     private FirebaseAuth refAuth;
 
     private BiometricPrompt biometricPrompt;
@@ -40,8 +41,7 @@ public class AuthLogin extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        // בדיקה אוטומטית אם המשתמש כבר מחובר
-        // אם כן, מדלגים ישר ל-MainActivity בלי לבקש התחברות
+
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
             Intent intent = new Intent(AuthLogin.this, MainActivity.class);
@@ -54,7 +54,7 @@ public class AuthLogin extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_auth_login); // layout של ה-Login
+        setContentView(R.layout.activity_auth_login);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -65,16 +65,20 @@ public class AuthLogin extends AppCompatActivity {
         editTextEmailAddress = findViewById(R.id.editTextEmailAddress);
         editTextPassword = findViewById(R.id.editTextPassword);
         button = findViewById(R.id.button);
-        btnBiometricLogin = findViewById(R.id.btnBiometricLogin); // תוודא שקיים ב-XML
+        btnBiometricLogin = findViewById(R.id.btnBiometricLogin);
+        btnNoUser = findViewById(R.id.btnNoUser);
 
         refAuth = FirebaseAuth.getInstance();
 
         button.setOnClickListener(v -> loginUser());
 
-        // הגדרת BiometricPrompt
+        btnNoUser.setOnClickListener(v -> {
+            Intent intent = new Intent(AuthLogin.this, AuthRegister.class);
+            startActivity(intent);
+        });
+
         setupBiometricPrompt();
 
-        // כפתור כניסה עם טביעת אצבע
         btnBiometricLogin.setOnClickListener(v -> {
             BiometricManager manager = BiometricManager.from(this);
             int canAuth = manager.canAuthenticate(
@@ -114,7 +118,6 @@ public class AuthLogin extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Log.i("AuthLogin", "signInWithEmailAndPassword: success");
 
-                            // שמירת פרטי התחברות לשימוש עתידי ב-Biometric (לשימוש לימודי)
                             SharedPreferences prefs = getSharedPreferences("auth_prefs", MODE_PRIVATE);
                             prefs.edit()
                                     .putString("email", email)
@@ -125,7 +128,6 @@ public class AuthLogin extends AppCompatActivity {
                                     "User logged in successfully",
                                     Toast.LENGTH_SHORT).show();
 
-                            // מעבר לאפליקציית ההשקעות
                             Intent intent = new Intent(AuthLogin.this, MainActivity.class);
                             startActivity(intent);
                             finish();
@@ -139,7 +141,6 @@ public class AuthLogin extends AppCompatActivity {
                 });
     }
 
-    // הגדרת BiometricPrompt
     private void setupBiometricPrompt() {
         Executor executor = ContextCompat.getMainExecutor(this);
 
@@ -151,7 +152,6 @@ public class AuthLogin extends AppCompatActivity {
                     public void onAuthenticationSucceeded(
                             @NonNull BiometricPrompt.AuthenticationResult result) {
                         super.onAuthenticationSucceeded(result);
-                        // אם טביעת האצבע הצליחה – להתחבר ל-Firebase עם הפרטים השמורים
                         loginWithSavedCredentials();
                     }
 
@@ -181,7 +181,6 @@ public class AuthLogin extends AppCompatActivity {
                 .build();
     }
 
-    // התחברות אוטומטית ל-Firebase לפי האימייל+סיסמה השמורים
     private void loginWithSavedCredentials() {
         SharedPreferences prefs = getSharedPreferences("auth_prefs", MODE_PRIVATE);
         String savedEmail = prefs.getString("email", null);

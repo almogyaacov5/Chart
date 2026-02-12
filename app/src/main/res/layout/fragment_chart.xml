@@ -8,127 +8,165 @@
     android:background="#F4F6F8"
     tools:context=".MainActivity">
 
-    <!-- מחיר נוכחי -->
+    <!-- ===== Top row: smaller + can wrap to 2 lines ===== -->
+
     <TextView
         android:id="@+id/priceText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Current price: "
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="#1E3A8A"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp" />
-
-    <!-- שינוי יומי -->
-    <TextView
-        android:id="@+id/changeText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Daily change: "
-        android:textSize="16sp"
-        android:textColor="#374151"
-        app:layout_constraintTop_toBottomOf="@id/priceText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="4dp" />
-
-    <!-- טיקר -->
-    <TextView
-        android:id="@+id/tickerText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Ticker: "
-        android:textSize="16sp"
-        android:textColor="#374151"
-        app:layout_constraintTop_toBottomOf="@id/changeText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="4dp" />
-
-    <!-- כניסת טיקר -->
-    <EditText
-        android:id="@+id/ticker_input"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:hint="Enter a ticker like NVDA"
-        android:padding="12dp"
-        android:textColor="#111827"
-        android:textColorHint="#9CA3AF"
+        android:text="Current price: "
         android:textSize="16sp"
-        app:layout_constraintTop_toBottomOf="@id/tickerText"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginHorizontal="32dp"
-        android:layout_marginTop="12dp" />
-
-    <!-- כפתור טעינה -->
-    <Button
-        android:id="@+id/btnLoad"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Open chart"
-        android:textColor="#FFFFFF"
-        android:backgroundTint="#2563EB"
-        android:paddingHorizontal="24dp"
-        android:paddingVertical="10dp"
+        android:textStyle="bold"
+        android:textColor="#0F172A"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:background="#FFFFFF"
+        android:elevation="2dp"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp"
+        android:layout_marginStart="12dp"
         android:layout_marginTop="12dp"
-        app:layout_constraintTop_toBottomOf="@id/ticker_input"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:layout_marginEnd="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/changeText"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintHorizontal_weight="1.25"
+        app:layout_constrainedWidth="true" />
 
-    <!-- גרף מניה נרות -->
+    <TextView
+        android:id="@+id/changeText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Daily change: "
+        android:textSize="12.5sp"
+        android:textColor="#334155"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:background="#FFFFFF"
+        android:elevation="2dp"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintTop_toTopOf="@id/priceText"
+        app:layout_constraintBottom_toBottomOf="@id/priceText"
+        app:layout_constraintStart_toEndOf="@id/priceText"
+        app:layout_constraintEnd_toStartOf="@id/tickerText"
+        app:layout_constraintHorizontal_weight="1.0"
+        app:layout_constrainedWidth="true" />
+
+    <TextView
+        android:id="@+id/tickerText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Ticker: "
+        android:textSize="12.5sp"
+        android:textColor="#334155"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:includeFontPadding="false"
+        android:background="#FFFFFF"
+        android:elevation="2dp"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintTop_toTopOf="@id/priceText"
+        app:layout_constraintBottom_toBottomOf="@id/priceText"
+        app:layout_constraintStart_toEndOf="@id/changeText"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="0.9"
+        app:layout_constrainedWidth="true" />
+
+    <!-- ===== Chart area: as big as possible ===== -->
+
     <com.github.mikephil.charting.charts.CandleStickChart
         android:id="@+id/stock_chart"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/btnLoad"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="#FFFFFF"
+        android:elevation="1dp"
+        app:layout_constraintTop_toBottomOf="@id/priceText"
+        app:layout_constraintBottom_toTopOf="@id/ticker_input"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/controls_row"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:elevation="4dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-
-
-    <!-- גרף קווי -->
     <com.github.mikephil.charting.charts.LineChart
         android:id="@+id/line_chart"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@id/btnLoad"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:background="#FFFFFF"
+        android:elevation="1dp"
+        android:visibility="gone"
+        app:layout_constraintTop_toBottomOf="@id/priceText"
+        app:layout_constraintBottom_toTopOf="@id/ticker_input"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/controls_row"
-        android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="8dp"
-        android:elevation="4dp"
-        android:visibility="gone"/>
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- שורת כפתורי פקדים -->
+    <!-- ===== Bottom controls (unchanged IDs) ===== -->
+
+    <EditText
+        android:id="@+id/ticker_input"
+        android:layout_width="0dp"
+        android:layout_height="48dp"
+        android:hint="Enter a ticker like NVDA"
+        android:paddingHorizontal="14dp"
+        android:textColor="#111827"
+        android:textColorHint="#9CA3AF"
+        android:textSize="15sp"
+        android:background="#FFFFFF"
+        android:elevation="3dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginBottom="10dp"
+        android:inputType="textCapCharacters"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnLoad"
+        app:layout_constraintBottom_toTopOf="@id/controls_row" />
+
+    <Button
+        android:id="@+id/btnLoad"
+        android:layout_width="110dp"
+        android:layout_height="48dp"
+        android:text="OPEN"
+        android:textColor="#FFFFFF"
+        android:textStyle="bold"
+        android:backgroundTint="#2563EB"
+        android:elevation="3dp"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/ticker_input"
+        app:layout_constraintBottom_toBottomOf="@id/ticker_input" />
+
     <LinearLayout
         android:id="@+id/controls_row"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@id/timeFrameText"
+        android:gravity="center_vertical"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="8dp"
+        android:background="#FFFFFF"
+        android:elevation="3dp"
+        android:padding="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="8dp">
+        app:layout_constraintBottom_toTopOf="@id/timeFrameText">
 
-        <!-- כפתור בחירת טיים פריים -->
         <ImageButton
             android:id="@+id/btnChartRefresh"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="8dp"
+            android:layout_width="44dp"
+            android:layout_height="44dp"
             android:background="@drawable/circle_button_background"
             android:contentDescription="רענן את המעקב"
             android:src="@drawable/outline_3d_rotation_24"
@@ -137,77 +175,68 @@
         <Button
             android:id="@+id/btnSelectTimeFrame"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="44dp"
             android:text="Time frame"
             android:textColor="#FFFFFF"
             android:backgroundTint="#4B5563"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
-            android:layout_marginHorizontal="8dp"/>
-
-        <!-- כפתור החלפת גרף -->
+            android:paddingHorizontal="12dp"
+            android:layout_marginStart="10dp" />
 
         <Button
             android:id="@+id/btnToggleChart"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="8dp"
+            android:layout_height="44dp"
             android:backgroundTint="#1E3A8A"
-            android:paddingHorizontal="16dp"
-            android:paddingVertical="8dp"
+            android:paddingHorizontal="12dp"
             android:text="Line chart"
-            android:textColor="#FFFFFF" />
+            android:textColor="#FFFFFF"
+            android:layout_marginStart="10dp" />
 
         <Button
             android:id="@+id/btnAIAnalysis"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="🤖 ניתוח AI"
-            android:layout_below="@id/btnToggleChart"
-            android:layout_marginTop="8dp" />
+            android:layout_height="44dp"
+            android:text="AI"
+            android:textColor="#FFFFFF"
+            android:backgroundTint="#8B5CF6"
+            android:paddingHorizontal="12dp"
+            android:layout_marginStart="10dp" />
 
         <ProgressBar
             android:id="@+id/progressAI"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
             android:visibility="gone" />
-
-        <TextView
-            android:id="@+id/currentPriceDisplay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="💰 מחיר נוכחי: $0.00"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:textColor="#FFD700"
-            android:background="#80000000"
-            android:padding="12dp"
-            android:layout_margin="16dp"
-            android:visibility="gone" />
-
-
-
-
-
-
-
-
     </LinearLayout>
 
-    <!-- כיתוב תקופת זמן -->
+    <TextView
+        android:id="@+id/currentPriceDisplay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="💰 מחיר נוכחי: $0.00"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#B45309"
+        android:background="#FFF7ED"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="8dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@id/timeFrameText"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="12dp"
+        android:layout_marginBottom="6dp"/>
+
     <TextView
         android:id="@+id/timeFrameText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Time frame: "
-        android:textSize="16sp"
-        android:textColor="#374151"
+        android:textSize="14sp"
+        android:textColor="#475569"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="12dp"/>
-
-
-
+        android:layout_marginBottom="10dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
