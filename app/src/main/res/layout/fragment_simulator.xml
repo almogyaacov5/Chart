@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F4F6FA"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- כותרת -->
+        <TextView
+            android:id="@+id/tvSimTitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📊 Trade Simulator"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:textColor="#111111"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- כרטיס הסבר -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="6dp"
+            android:layout_marginBottom="16dp"
+            android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvSimInfo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="80dp"
+                android:padding="16dp"
+                android:gravity="right"
+                android:text="הרץ סימולציה על כל הטריידים הסגורים שלך וראה מה הייתה התוצאה אילו השקעת סכום קבוע."
+                android:textColor="#444444"
+                android:textDirection="rtl"
+                android:textSize="16.9sp"
+                android:lineSpacingExtra="4dp" />
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- כפתור -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnRunSimulation"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="הפעל סימולציה"
+            android:textAllCaps="false"
+            android:textSize="16sp"
+            app:cornerRadius="28dp"
+            app:backgroundTint="#2962FF"
+            android:textColor="#FFFFFF"
+            android:elevation="4dp"/>
+
+        <!-- Progress -->
+        <ProgressBar
+            android:id="@+id/progressSim"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"/>
+
+        <!-- תוצאה -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="8dp"
+            android:layout_marginTop="20dp"
+            android:visibility="visible">
+
+            <TextView
+                android:id="@+id/tvSimResult"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="18dp"
+                android:textSize="16sp"
+                android:textColor="#111111"
+                android:textDirection="rtl"
+                android:gravity="right"/>
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+</ScrollView>

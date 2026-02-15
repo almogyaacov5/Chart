@@ -1,39 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.chart">
-    <!-- כי אתה עושה קריאות רשת (OkHttp / APIs) -->
+    xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Chart">
+        android:theme="@style/Theme.Chart"
+        tools:targetApi="31">
+
         <activity
             android:name=".Simulator"
-            android:exported="false" />
-        <!-- מסך כניסה (Launcher) -->
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+
         <activity
             android:name=".AuthLogin"
             android:exported="true"
             android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-        </activity> <!-- הרשמה -->
+        </activity>
+
         <activity
             android:name=".AuthRegister"
             android:exported="false"
-            android:windowSoftInputMode="stateHidden|adjustResize" /> <!-- המסך הראשי עם הניווט והגרפים -->
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
         <activity
             android:name=".MainActivity"
             android:exported="false"
             android:windowSoftInputMode="stateHidden|adjustResize" />
+
     </application>
 
 </manifest>

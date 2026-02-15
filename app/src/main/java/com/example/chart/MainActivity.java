@@ -1,6 +1,7 @@
 package com.example.chart;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -65,17 +66,27 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_chart) {
             selectedFragment = new ChartFragment();
             title = "Chart";
-        } else if (id == R.id.nav_stocks) {
+        }
+        else if (id == R.id.nav_stocks) {
             // רשימת מעקב (My Stocks)
             selectedFragment = new WatchlistFragment();
             title = "My Stocks";
-        } else if (id == R.id.nav_portfolio) {
+        }
+        else if (id == R.id.nav_portfolio) {
             selectedFragment = new PortfolioFragment();
             title = "Portfolio";
-        } else if (id == R.id.nav_closed_trades) {
+        }
+        else if (id == R.id.nav_closed_trades) {
             selectedFragment = new ClosedTradesFragment();
             title = "Closed Trades";
         }
+        else if (id == R.id.nav_simulator) {
+        selectedFragment = new SimulatorFragment();
+        title = "Simulator";
+        }
+
+
+
 
         if (selectedFragment != null) {
             getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container, selectedFragment).commit();
