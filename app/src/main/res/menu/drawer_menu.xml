@@ -4,6 +4,8 @@
         <item android:id="@+id/nav_portfolio" android:title="Portfolio" />
         <item android:id="@+id/nav_stocks" android:title="My Stocks" />
         <item android:id="@+id/nav_closed_trades" android:title="Closed Trades" />
+        <item android:id="@+id/nav_simulator" android:title="Simulator" />
+
 
     </group>
 </menu>
