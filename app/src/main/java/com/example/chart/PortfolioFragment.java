@@ -55,7 +55,8 @@ public class PortfolioFragment extends Fragment {
         // הגנה: אם אין משתמש מחובר (currentUser == null) אל תנסה getUid() כדי למנוע קריסה
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user == null) {
-            goToLogin();
+            startActivity(new Intent(requireContext(), AuthLogin.class));
+            requireActivity().finish();
             return v;
         }
 

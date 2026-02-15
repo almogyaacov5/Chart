@@ -2,16 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.chart">
 
-    <!-- רשת (OkHttp + Firebase) -->
+    <!-- כי אתה עושה קריאות רשת (OkHttp / APIs) -->
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
-    <!-- ביומטרי -->
-    <uses-permission android:name="android.permission.USE_BIOMETRIC" />
-    <!-- לתמיכה לאחור במכשירים ישנים (לא חובה, אבל בטוח) -->
-    <uses-permission
-        android:name="android.permission.USE_FINGERPRINT"
-        android:maxSdkVersion="28" />
 
     <application
         android:allowBackup="true"
@@ -21,36 +14,28 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Chart">
 
-        <activity
-            android:name=".AuthRegister"
-            android:exported="false" />
-
+        <!-- מסך כניסה (Launcher) -->
         <activity
             android:name=".AuthLogin"
-            android:exported="false" />
-
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-
+            android:exported="true"
+            android:windowSoftInputMode="stateHidden|adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
 
+        <!-- הרשמה -->
+        <activity
+            android:name=".AuthRegister"
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+
+        <!-- המסך הראשי עם הניווט והגרפים -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
     </application>
 
 </manifest>
-
-
-
-
-
-
-
-
-
-
-
