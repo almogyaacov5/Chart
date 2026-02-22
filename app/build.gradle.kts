@@ -56,4 +56,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.10.1")
     implementation("androidx.biometric:biometric:1.2.0-alpha05")
     implementation("com.google.firebase:firebase-database:20.3.0")
+    implementation ("com.squareup.okhttp3:okhttp:4.12.0")
+
+
+
 }

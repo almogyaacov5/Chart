@@ -8,7 +8,7 @@
     android:background="#F4F6F8"
     tools:context=".MainActivity">
 
-    <!-- ===== Top row: smaller + can wrap to 2 lines ===== -->
+    <!-- ===== Top row: Price, Change, Ticker ===== -->
 
     <TextView
         android:id="@+id/priceText"
@@ -79,7 +79,7 @@
         app:layout_constraintHorizontal_weight="0.9"
         app:layout_constrainedWidth="true" />
 
-    <!-- ===== Chart area: as big as possible ===== -->
+    <!-- ===== Charts ===== -->
 
     <com.github.mikephil.charting.charts.CandleStickChart
         android:id="@+id/stock_chart"
@@ -112,13 +112,13 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- ===== Bottom controls (unchanged IDs) ===== -->
+    <!-- ===== Search Input + Open Button ===== -->
 
     <androidx.appcompat.widget.AppCompatAutoCompleteTextView
         android:id="@+id/ticker_input"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:hint="Enter a ticker like NVDA"
+        android:hint="Enter a ticker"
         android:paddingHorizontal="14dp"
         android:textColor="#111827"
         android:textColorHint="#9CA3AF"
@@ -128,14 +128,11 @@
         android:layout_marginStart="12dp"
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
-
-        android:completionThreshold="2"
         android:inputType="text"
         android:singleLine="true"
         android:imeOptions="actionSearch"
         android:textDirection="ltr"
         android:popupBackground="#FFFFFF"
-
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/btnLoad"
         app:layout_constraintBottom_toTopOf="@id/controls_row" />
@@ -153,6 +150,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/ticker_input"
         app:layout_constraintBottom_toBottomOf="@id/ticker_input" />
+
+    <!-- ===== Control Buttons Row ===== -->
 
     <LinearLayout
         android:id="@+id/controls_row"
@@ -217,6 +216,8 @@
             android:visibility="gone" />
     </LinearLayout>
 
+    <!-- ===== Current Price Display (Optional) ===== -->
+
     <TextView
         android:id="@+id/currentPriceDisplay"
         android:layout_width="wrap_content"
@@ -229,10 +230,12 @@
         android:paddingHorizontal="10dp"
         android:paddingVertical="8dp"
         android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@id/timeFrameText"
-        app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="12dp"
-        android:layout_marginBottom="6dp"/>
+        android:layout_marginBottom="6dp"
+        app:layout_constraintBottom_toTopOf="@id/timeFrameText"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- ===== Time Frame Text ===== -->
 
     <TextView
         android:id="@+id/timeFrameText"
@@ -241,9 +244,9 @@
         android:text="Time frame: "
         android:textSize="14sp"
         android:textColor="#475569"
+        android:layout_marginBottom="10dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginBottom="10dp" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

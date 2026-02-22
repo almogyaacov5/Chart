@@ -10,6 +10,7 @@ import android.os.Looper;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,11 +59,8 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFrameListener {
-
     private CandleStickChart candleStickChart;
     private LineChart lineChart;
-
-    // היה EditText -> עכשיו AutoCompleteTextView
     private AutoCompleteTextView tickerInput;
     private Button btnLoad, btnTimeFrame, btnToggleChart, btnAIAnalysis;
     private ImageButton btnChartRefresh;
@@ -84,13 +82,10 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
     private float lastPrice = 0f;
     private boolean isManualSelection = false;
 
-
-    // --- Autocomplete ---
     private ArrayAdapter<StockSuggestion> suggestionAdapter;
     private final Handler searchHandler = new Handler(Looper.getMainLooper());
     private Runnable pendingSearch;
-    private Call symbolSearchCall;
-    private static final long SEARCH_DEBOUNCE_MS = 100;
+    private static final long SEARCH_DEBOUNCE_MS = 50;
 
     public static class StockSuggestion {
         public final String symbol;
@@ -124,13 +119,11 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         candleStickChart = v.findViewById(R.id.stock_chart);
         lineChart = v.findViewById(R.id.line_chart);
         tickerInput = v.findViewById(R.id.ticker_input);
-
         btnLoad = v.findViewById(R.id.btnLoad);
         btnTimeFrame = v.findViewById(R.id.btnSelectTimeFrame);
         btnToggleChart = v.findViewById(R.id.btnToggleChart);
         btnChartRefresh = v.findViewById(R.id.btnChartRefresh);
         btnAIAnalysis = v.findViewById(R.id.btnAIAnalysis);
-
         progressAI = v.findViewById(R.id.progressAI);
         priceText = v.findViewById(R.id.priceText);
         changeText = v.findViewById(R.id.changeText);
@@ -151,7 +144,6 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
 
         setupAutoComplete();
         setupClickListeners();
-
         fetchStockData(symbol, interval);
         return v;
     }
@@ -174,15 +166,18 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
 
             String picked = sel.symbol.trim().toUpperCase(Locale.US);
 
-            // 🔥 מעלים את הדגל כדי לחסום את ה-TextWatcher
             isManualSelection = true;
             tickerInput.setText(picked);
             tickerInput.setSelection(picked.length());
-            tickerInput.dismissDropDown(); // סוגר את הרשימה מיד
+            tickerInput.dismissDropDown();
 
             setSymbolAndLoad(picked);
 
-            // מורידים את הדגל אחרי עיכוב קצר
+            tickerInput.setText("");
+            tickerInput.clearFocus();
+            hideKeyboard();
+            clearSuggestions();
+
             tickerInput.postDelayed(() -> isManualSelection = false, 300);
         });
 
@@ -192,8 +187,7 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (isManualSelection) return; // 🔥 חוסם חיפוש בזמן בחירה ידנית
-
+                if (isManualSelection) return;
                 String q = (s == null) ? "" : s.toString().trim();
                 scheduleSymbolSearch(q);
             }
@@ -257,16 +251,13 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
             return;
         }
 
-        // אם זה שם חברה/טקסט חופשי, ננסה לפתוח את ההתאמה הראשונה
         resolveFirstMatchAndOpen(q);
     }
 
     private void setSymbolAndLoad(String sym) {
         symbol = sym;
-
         if (tickerText != null) tickerText.setText("Ticker: " + symbol);
         if (getActivity() != null) getActivity().setTitle("Chart: " + symbol);
-
         fetchStockData(symbol, interval);
         hideKeyboard();
     }
@@ -275,7 +266,7 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         try {
             String encoded = URLEncoder.encode(query, StandardCharsets.UTF_8.name());
             String url = "https://api.twelvedata.com/symbol_search?symbol=" + encoded +
-                    "&outputsize=1&apikey=" + API_KEY;
+                    "&outputsize=1&country=US&exchange=NYSE&apikey=" + API_KEY;
 
             Request request = new Request.Builder().url(url).build();
             client.newCall(request).enqueue(new Callback() {
@@ -316,25 +307,23 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
     }
 
     private void scheduleSymbolSearch(String q) {
+        if (q.length() == 1 && !Character.isLetterOrDigit(q.charAt(0))) {
+            clearSuggestions();
+            return;
+        }
+
         if (pendingSearch != null) searchHandler.removeCallbacks(pendingSearch);
         pendingSearch = null;
-
-        if (symbolSearchCall != null) {
-            symbolSearchCall.cancel();
-            symbolSearchCall = null;
-        }
 
         if (q == null) q = "";
         q = q.trim();
         latestQuery = q;
 
-        // אם אין טקסט – ננקה ונצא
         if (q.length() < 1) {
             clearSuggestions();
             return;
         }
 
-        // הגנה פשוטה כדי לא לחפור על טקסט ארוך מדי
         if (q.length() > 50) {
             clearSuggestions();
             return;
@@ -356,61 +345,113 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
     private void fetchSymbolSuggestions(String query) {
         try {
             String encoded = URLEncoder.encode(query, StandardCharsets.UTF_8.name());
-            String url = "https://api.twelvedata.com/symbol_search?symbol=" + encoded +
-                    "&outputsize=20&apikey=" + API_KEY;
 
-            Request request = new Request.Builder().url(url).build();
-            symbolSearchCall = client.newCall(request);
+            if (suggestionAdapter != null) {
+                suggestionAdapter.clear();
+                suggestionAdapter.notifyDataSetChanged();
+            }
 
-            symbolSearchCall.enqueue(new Callback() {
-                @Override
-                public void onFailure(@NonNull Call call, @NonNull IOException e) { }
+            final java.util.HashSet<String> addedSymbols = new java.util.HashSet<>();
 
-                @Override
-                public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                    if (!response.isSuccessful() || response.body() == null) return;
-
-                    ArrayList<StockSuggestion> list = new ArrayList<>();
-
-                    try {
-                        JSONObject json = new JSONObject(response.body().string());
-                        JSONArray data = json.optJSONArray("data");
-                        if (data == null) return;
-
-                        for (int i = 0; i < data.length(); i++) {
-                            JSONObject o = data.optJSONObject(i);
-                            if (o == null) continue;
-
-                            String sym = o.optString("symbol", "").trim();
-                            if (sym.isEmpty()) continue;
-
-                            String name = o.optString("instrument_name", "");
-                            String ex = o.optString("exchange", "");
-
-                            list.add(new StockSuggestion(sym, name, ex));
-                        }
-                    } catch (Exception ignored) { }
-
-                    if (getActivity() == null) return;
-                    getActivity().runOnUiThread(() -> {
-                        if (!query.equals(latestQuery)) return;  // מונע race של תוצאות ישנות
-                        if (suggestionAdapter == null) return;
-
-                        suggestionAdapter.clear();
-                        suggestionAdapter.addAll(list);
-                        suggestionAdapter.notifyDataSetChanged();
-
-                        if (tickerInput != null && tickerInput.hasFocus() && !list.isEmpty()) {
-                            tickerInput.showDropDown();
-                        } else if (tickerInput != null) {
-                            tickerInput.dismissDropDown();
-                        }
-                    });
-                }
-            });
+            fetchSymbolSuggestionsOneExchange(encoded, query, "NYSE", addedSymbols);
+            fetchSymbolSuggestionsOneExchange(encoded, query, "NASDAQ", addedSymbols);
 
         } catch (Exception ignored) { }
     }
+
+    private void fetchSymbolSuggestionsOneExchange(String encoded, String originalQuery, String exchange,
+                                                   java.util.HashSet<String> addedSymbols) {
+
+        String url = "https://api.twelvedata.com/symbol_search?symbol=" + encoded +
+                "&outputsize=20&country=US&exchange=" + exchange +
+                "&apikey=" + API_KEY;
+
+        Request request = new Request.Builder().url(url).build();
+
+        client.newCall(request).enqueue(new Callback() {
+
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                // לא צריך לעשות כלום
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+
+                if (!response.isSuccessful() || response.body() == null) return;
+                ArrayList<StockSuggestion> list = new ArrayList<>();
+
+                try {
+                    JSONObject json = new JSONObject(response.body().string());
+                    JSONArray data = json.optJSONArray("data");
+                    if (data == null) return;
+
+                    for (int i = 0; i < data.length(); i++) {
+                        JSONObject o = data.optJSONObject(i);
+                        if (o == null) continue;
+
+                        String sym = o.optString("symbol", "").trim();
+                        if (sym.isEmpty()) continue;
+
+                        String name = o.optString("instrument_name", "");
+                        String ex = o.optString("exchange", "");
+
+                        if (!"NYSE".equalsIgnoreCase(ex) && !"NASDAQ".equalsIgnoreCase(ex))
+                            continue;
+
+                        synchronized (addedSymbols) {
+                            if (addedSymbols.contains(sym)) continue;
+                            addedSymbols.add(sym);
+                        }
+
+                        list.add(new StockSuggestion(sym, name, ex));
+                    }
+
+                } catch (Exception ignored) { }
+
+                if (getActivity() == null) return;
+
+                getActivity().runOnUiThread(() -> {
+
+                    if (!originalQuery.equals(latestQuery)) return;
+                    if (suggestionAdapter == null) return;
+
+                    suggestionAdapter.addAll(list);
+                    suggestionAdapter.notifyDataSetChanged();
+
+                    if (tickerInput == null) return;
+
+                    if (tickerInput == null) return;
+
+                    CharSequence cs = tickerInput.getText();
+                    if (cs == null) return;
+
+// מספיק תווים כדי להציג הצעות (threshold) [web:100]
+                    if (tickerInput.enoughToFilter()) {
+                        suggestionAdapter.getFilter().filter(cs, count -> {
+                            // אם יש תוצאות אחרי פילטר – תפתח
+                            if (count > 0) {
+                                tickerInput.showDropDown();
+                            } else {
+                                tickerInput.dismissDropDown();
+                            }
+                        });
+                    }
+
+
+
+                    if (tickerInput != null &&
+                            tickerInput.hasFocus() &&
+                            suggestionAdapter.getCount() > 0) {
+                        tickerInput.post(() -> tickerInput.showDropDown());
+                    }
+
+
+                });
+            }
+        });
+    }
+
 
     @Override
     public void onTimeFrameSelected(String interval) {
@@ -486,19 +527,6 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
                 tvResponse.setText("❌ שגיאה: " + error);
             }
         });
-    }
-
-    private void showAnalysisDialog(String analysis) {
-        String fullMessage = "🚨 <b><big><font color='#FF0000'>מחיר נוכחי: $" +
-                df.format(lastPrice) + "</font></big></b> 🚨<br><br>" +
-                "<b>סימול:</b> " + symbol + "<br><br>" + analysis;
-
-        new AlertDialog.Builder(requireContext())
-                .setTitle("🤖 ניתוח AI - Perplexity")
-                .setMessage(Html.fromHtml(fullMessage))
-                .setPositiveButton("סגור", null)
-                .setNeutralButton("שמור היסטוריה", (dialog, which) -> saveAnalysis(symbol, analysis))
-                .show();
     }
 
     private void saveAnalysis(String symbol, String analysis) {
@@ -611,8 +639,6 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         });
     }
 
-
-
     private void updateCandleChart(List<CandleEntry> entries) {
         CandleDataSet dataSet = new CandleDataSet(entries, "Stock candle chart");
         dataSet.setDecreasingColor(Color.RED);
@@ -655,6 +681,4 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         fragment.setArguments(args);
         return fragment;
     }
-
-
 }
