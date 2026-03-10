@@ -26,7 +26,7 @@ public class LLMService {
     // Gemini API (Models API)
     private static final String GEMINI_API_URL=
             "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent";
-    private static final String API_KEY = "AIzaSyCAsVHfPVd9GpkgbzhY0lUH7T12dZAdfnQ";
+    private static final String API_KEY = "DUMMY_KEY_FOR_GITHUB";
 
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
