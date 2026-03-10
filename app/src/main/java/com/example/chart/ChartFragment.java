@@ -70,7 +70,7 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
     private final OkHttpClient client = new OkHttpClient();
     private final String API_KEY = "0518811f0d394fa39842a8024a25c049";
 
-    private String symbol = "NVDA";
+    private String symbol = "SPY";
     private String interval = "1day";
     private boolean isCandleStick = true;
     private final DecimalFormat df = new DecimalFormat("#.##");
@@ -131,7 +131,7 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         tickerText = v.findViewById(R.id.tickerText);
         currentPriceDisplay = v.findViewById(R.id.currentPriceDisplay);
 
-        llmService = new LLMService(getContext());
+        llmService = new LLMService();
         if (progressAI != null) progressAI.setVisibility(View.GONE);
         if (currentPriceDisplay != null) currentPriceDisplay.setVisibility(View.GONE);
 

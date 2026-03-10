@@ -51,7 +51,8 @@ public class ClosedTradesFragment extends Fragment {
         progressBar = v.findViewById(R.id.aiProgressBar);
 
         // יצירת השירות עם Context (עכשיו זה יעבוד תקין)
-        llmService = new LLMService(getContext());
+        llmService = new LLMService();
+
 
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         if (currentUser != null) {
