@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class LLMService {
 
     // Gemini API (Models API)
-    private static final String GEMINI_API_URL =
+    private static final String GEMINI_API_URL=
             "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent";
     private static final String API_KEY = "AIzaSyCAsVHfPVd9GpkgbzhY0lUH7T12dZAdfnQ";
 
