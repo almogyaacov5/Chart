@@ -48,8 +48,8 @@ public class MainActivity extends AppCompatActivity {
 
         requestNotificationPermissionIfNeeded();
 
-        toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+//        toolbar = findViewById(R.id.toolbar);
+//        setSupportActionBar(toolbar);
 
         drawerLayout = findViewById(R.id.drawer_layout);
         drawerRecyclerView = findViewById(R.id.drawerRecyclerView);
