@@ -461,12 +461,16 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
     }
 
     private void analyzeWithAI() {
+        android.util.Log.d("LLM", "analyzeWithAI נקרא, fullCloses size: " + fullCloses.size());
+        android.util.Log.d("LLM", "lastPrice: " + lastPrice);
+
         if (fullCloses.isEmpty() || fullCloses.size() < 2) {
             Toast.makeText(requireContext(), "טען נתוני גרף קודם (מינימום 2 נקודות)", Toast.LENGTH_SHORT).show();
             return;
         }
         showCustomAIDialog();
     }
+
 
     private void showCustomAIDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
@@ -482,7 +486,7 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         tvHint.setText("דוגמאות: 'מה דעתך על השקעה קצרת טווח?' או 'האם לקנות עכשיו?'");
 
         AlertDialog dialog = builder.setView(dialogView)
-                .setTitle("🤖 שאל את ה-AI")
+                .setTitle("שאל את ה-AI")
                 .setNegativeButton("ביטול", null)
                 .create();
 
@@ -501,6 +505,11 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
 
     private void sendQuestionToAI(String question, TextView tvResponse,
                                   ProgressBar progressBar, android.widget.EditText etQuestion, AlertDialog dialog) {
+
+        android.util.Log.d("LLM", "sendQuestionToAI נקרא");
+        android.util.Log.d("LLM", "sendQuestionToAI נקרא עם שאלה: " + question);
+        android.util.Log.d("LLM", "fullCloses size: " + fullCloses.size());
+
         progressBar.setVisibility(View.VISIBLE);
         etQuestion.setEnabled(false);
 
@@ -513,21 +522,32 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         llmService.askQuestion(symbol, question, context, fullCloses, new LLMService.AnalysisCallback() {
             @Override
             public void onAnalysisReceived(String analysis) {
-                progressBar.setVisibility(View.GONE);
-                etQuestion.setEnabled(true);
-                etQuestion.setText("");
-                tvResponse.setText(analysis);
-                tvResponse.setVisibility(View.VISIBLE);
+                android.util.Log.d("LLM", "onAnalysisReceived נקרא! אורך תשובה: " + analysis.length());
+                if (getActivity() == null) return;
+                getActivity().runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    etQuestion.setEnabled(true);
+                    etQuestion.setText("");
+                    tvResponse.setText(analysis);
+                    tvResponse.setVisibility(View.VISIBLE);
+                });
             }
 
             @Override
             public void onError(String error) {
-                progressBar.setVisibility(View.GONE);
-                etQuestion.setEnabled(true);
-                tvResponse.setText("❌ שגיאה: " + error);
+                android.util.Log.d("LLM", "onError נקרא: " + error);
+                if (getActivity() == null) return;
+                getActivity().runOnUiThread(() -> {
+                    progressBar.setVisibility(View.GONE);
+                    etQuestion.setEnabled(true);
+                    tvResponse.setText("❌ שגיאה: " + error);
+                    tvResponse.setVisibility(View.VISIBLE);
+                });
             }
         });
     }
+
+
 
     private void saveAnalysis(String symbol, String analysis) {
         try {

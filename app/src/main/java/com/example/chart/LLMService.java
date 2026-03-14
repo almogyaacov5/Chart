@@ -23,10 +23,9 @@ import java.util.concurrent.TimeUnit;
 
 public class LLMService {
 
-    // Gemini API (Models API)
-    private static final String GEMINI_API_URL=
-            "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent";
-    private static final String API_KEY = "AIzaSyCAsVHfPVd9GpkgbzhY0lUH7T12dZAdfnQ";
+    private static final String GEMINI_API_URL =
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent";
+    private static final String API_KEY = "AIzaSyCypAZYzEJHLIlNJ27OC70ma3OLccXDveQ";
 
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -34,6 +33,7 @@ public class LLMService {
             .build();
 
     private final DecimalFormat df = new DecimalFormat("#.##");
+    private long lastRequestTime = 0;
 
     public interface AnalysisCallback {
         void onAnalysisReceived(String analysis);
@@ -47,7 +47,6 @@ public class LLMService {
 
     public LLMService() { }
 
-    // לשימוש כללי
     public void generateContent(String prompt, LLMCallback callback) {
         sendToGemini(prompt, new AnalysisCallback() {
             @Override
@@ -61,7 +60,6 @@ public class LLMService {
         });
     }
 
-    // לשאלה על מניה
     public void askQuestion(String symbol, String question, String context,
                             List<Float> closes, AnalysisCallback callback) {
         String pricesStr = "לא זמין";
@@ -86,17 +84,27 @@ public class LLMService {
         sendToGemini(prompt, callback);
     }
 
-    // --- קריאה ל‑Gemini ---
-
     private void sendToGemini(String prompt, AnalysisCallback callback) {
+        long now = System.currentTimeMillis();
+        long timeSinceLast = now - lastRequestTime;
+
+        if (timeSinceLast < 5000) {
+            long delay = 5000 - timeSinceLast;
+            android.util.Log.d("LLM", "ממתין " + delay + "ms לפני הקריאה");
+            new Handler(Looper.getMainLooper()).postDelayed(() ->
+                    sendToGemini(prompt, callback), delay);
+            return;
+        }
+
+        lastRequestTime = System.currentTimeMillis();
+        android.util.Log.d("LLM", "שולח בקשה ל-Gemini...");
+
         JSONObject requestBody = new JSONObject();
         try {
-            // פורמט Gemini: { contents: [ { parts: [ { text: "..." } ] } ] }
             JSONObject part = new JSONObject().put("text", prompt);
             JSONArray parts = new JSONArray().put(part);
             JSONObject content = new JSONObject().put("parts", parts);
             JSONArray contents = new JSONArray().put(content);
-
             requestBody.put("contents", contents);
         } catch (Exception e) {
             notifyError(callback, "שגיאה בבניית הבקשה: " + e.getMessage());
@@ -116,16 +124,24 @@ public class LLMService {
                 .post(body)
                 .build();
 
-
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                android.util.Log.e("LLM", "שגיאת רשת: " + e.getMessage());
                 notifyError(callback, "שגיאת רשת: " + e.getMessage());
             }
 
             @Override
             public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 String responseBody = response.body() != null ? response.body().string() : "";
+                android.util.Log.d("LLM", "קוד תגובה: " + response.code());
+
+                // *** תיקון הבעיה – עצירת הלולאה ***
+                if (response.code() == 429) {
+                    android.util.Log.w("LLM", "429 - המכסה נגמרה");
+                    notifyError(callback, "❌ המכסה היומית של Gemini נגמרה.\nנסה שוב מחר בשעה 10:00 בבוקר.");
+                    return;
+                }
 
                 if (!response.isSuccessful()) {
                     notifyError(callback, "שגיאת API " + response.code() + ": " + responseBody);
@@ -133,11 +149,10 @@ public class LLMService {
                 }
 
                 try {
-                    // Gemini מחזיר: { "candidates": [ { "content": { "parts": [ { "text": "..." } ] } } ] }
                     JSONObject json = new JSONObject(responseBody);
                     JSONArray candidates = json.optJSONArray("candidates");
                     if (candidates == null || candidates.length() == 0) {
-                        notifyError(callback, "לא התקבלה תשובה מה‑AI");
+                        notifyError(callback, "לא התקבלה תשובה מה-AI");
                         return;
                     }
 
@@ -149,6 +164,7 @@ public class LLMService {
                         sb.append(parts.getJSONObject(i).optString("text", ""));
                     }
                     String result = sb.toString().trim();
+                    android.util.Log.d("LLM", "תשובה התקבלה בהצלחה!");
 
                     new Handler(Looper.getMainLooper()).post(() ->
                             callback.onAnalysisReceived(result));
