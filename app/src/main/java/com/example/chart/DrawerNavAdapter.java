@@ -49,11 +49,21 @@ public class DrawerNavAdapter extends RecyclerView.Adapter<DrawerNavAdapter.VH> 
         holder.txtTitle.setText(item.title);
 
         boolean selected = (item.id == selectedId);
-        int bg = selected ? android.R.color.holo_blue_light : android.R.color.transparent;
-        holder.root.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), bg));
+
+        if (selected) {
+            holder.root.setBackgroundResource(R.drawable.nav_item_selected_bg);
+            holder.txtTitle.setTextColor(0xFF000000); // שחור מלא
+            holder.txtTitle.setAlpha(1.0f);
+        } else {
+            holder.root.setBackgroundResource(R.drawable.nav_item_default_bg);
+            holder.txtTitle.setTextColor(0xFF000000); // שחור
+            holder.txtTitle.setAlpha(0.8f); // דהוי
+        }
+
 
         holder.itemView.setOnClickListener(v -> listener.onClick(item));
     }
+
 
     @Override
     public int getItemCount() {

@@ -131,12 +131,15 @@ public class AuthLogin extends AppCompatActivity {
                             Intent intent = new Intent(AuthLogin.this, MainActivity.class);
                             startActivity(intent);
                             finish();
-                        } else {
-                            Log.e("AuthLogin", "signInWithEmailAndPassword: failure", task.getException());
-                            Toast.makeText(getApplicationContext(),
-                                    "Authentication failed",
-                                    Toast.LENGTH_SHORT).show();
                         }
+                        else {
+                            String errorMsg = task.getException() != null ? task.getException().getMessage() : "Unknown error";
+                            Log.e("AuthLogin", "failure: " + errorMsg);
+                            Toast.makeText(getApplicationContext(),
+                                    errorMsg,
+                                    Toast.LENGTH_LONG).show();
+                        }
+
                     }
                 });
     }

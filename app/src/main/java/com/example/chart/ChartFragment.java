@@ -486,7 +486,6 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
         tvHint.setText("דוגמאות: 'מה דעתך על השקעה קצרת טווח?' או 'האם לקנות עכשיו?'");
 
         AlertDialog dialog = builder.setView(dialogView)
-                .setTitle("שאל את ה-AI")
                 .setNegativeButton("ביטול", null)
                 .create();
 
@@ -501,6 +500,10 @@ public class ChartFragment extends Fragment implements TimeFrameFragment.TimeFra
 
         dialog.show();
         etQuestion.requestFocus();
+        // הסרת הרקע הלבן של הדיאלוג
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        }
     }
 
     private void sendQuestionToAI(String question, TextView tvResponse,

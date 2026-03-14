@@ -23,8 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 public class LLMService {
 
-    private static final String GEMINI_API_URL =
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent";
+    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent";
     private static final String API_KEY = "AIzaSyCypAZYzEJHLIlNJ27OC70ma3OLccXDveQ";
 
     private final OkHttpClient client = new OkHttpClient.Builder()
