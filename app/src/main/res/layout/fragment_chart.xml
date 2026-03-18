@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -137,19 +138,20 @@
         app:layout_constraintEnd_toStartOf="@id/btnLoad"
         app:layout_constraintBottom_toTopOf="@id/controls_row" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnLoad"
         android:layout_width="110dp"
         android:layout_height="48dp"
         android:text="OPEN"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
-        android:backgroundTint="#2563EB"
+        android:background="@drawable/btn_open"
         android:elevation="3dp"
         android:layout_marginEnd="12dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/ticker_input"
         app:layout_constraintBottom_toBottomOf="@id/ticker_input" />
+
 
     <!-- ===== Control Buttons Row ===== -->
 
@@ -167,6 +169,7 @@
         android:padding="10dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:layoutDirection="ltr"
         app:layout_constraintBottom_toTopOf="@id/timeFrameText">
 
         <ImageButton
@@ -177,35 +180,37 @@
             android:contentDescription="רענן את המעקב"
             android:src="@drawable/baseline_refresh_24" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSelectTimeFrame"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
             android:text="Time frame"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#4B5563"
+            android:background="@drawable/btn_timeframe"
             android:paddingHorizontal="12dp"
             android:layout_marginStart="10dp" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnToggleChart"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
-            android:backgroundTint="#1E3A8A"
-            android:paddingHorizontal="12dp"
             android:text="Line chart"
             android:textColor="#FFFFFF"
+            android:background="@drawable/btn_linechart"
+            android:paddingHorizontal="12dp"
             android:layout_marginStart="10dp" />
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnAIAnalysis"
             android:layout_width="wrap_content"
             android:layout_height="44dp"
             android:text="AI"
             android:textColor="#FFFFFF"
-            android:backgroundTint="#8B5CF6"
+            android:background="@drawable/btn_ai"
             android:paddingHorizontal="12dp"
             android:layout_marginStart="10dp" />
+
+
 
         <ProgressBar
             android:id="@+id/progressAI"
@@ -215,7 +220,7 @@
             android:visibility="gone" />
     </LinearLayout>
 
-    <!-- ===== Current Price Display (Optional) ===== -->
+    <!-- ===== Current Price Display ===== -->
 
     <TextView
         android:id="@+id/currentPriceDisplay"

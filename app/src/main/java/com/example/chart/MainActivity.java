@@ -5,20 +5,19 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.core.view.GravityCompat;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -27,16 +26,12 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private DrawerLayout drawerLayout;
-    private Toolbar toolbar;
-    private ActionBarDrawerToggle toggle;
-
+    private BottomSheetBehavior<View> bottomSheetBehavior;
     private RecyclerView drawerRecyclerView;
     private DrawerNavAdapter drawerAdapter;
 
-    // --- Nav order prefs ---
     private static final String PREFS_NAME = "nav_prefs";
-    private static final String KEY_NAV_ORDER = "nav_order"; // "nav_chart,nav_stocks,..."
+    private static final String KEY_NAV_ORDER = "nav_order";
 
     private final ActivityResultLauncher<String> notificationPermissionLauncher =
             registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> { });
@@ -48,19 +43,34 @@ public class MainActivity extends AppCompatActivity {
 
         requestNotificationPermissionIfNeeded();
 
-//        toolbar = findViewById(R.id.toolbar);
-//        setSupportActionBar(toolbar);
-
-        drawerLayout = findViewById(R.id.drawer_layout);
         drawerRecyclerView = findViewById(R.id.drawerRecyclerView);
 
-        toggle = new ActionBarDrawerToggle(
-                this, drawerLayout, toolbar,
-                R.string.navigation_drawer_open,
-                R.string.navigation_drawer_close
-        );
-        drawerLayout.addDrawerListener(toggle);
-        toggle.syncState();
+        // Bottom Sheet setup
+        View bottomSheet = findViewById(R.id.bottom_sheet_drawer);
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
+        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        bottomSheetBehavior.setHideable(true);
+        bottomSheetBehavior.setPeekHeight(0);
+
+        // פתיחת ה-Bottom Sheet בלחיצה על הרצועה בתחתית
+        findViewById(R.id.swipe_handle).setOnClickListener(v ->
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED));
+
+        // סגירה בלחיצה על הרקע
+        findViewById(R.id.fragment_container).setOnClickListener(v -> {
+            if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        });
+
+        findViewById(R.id.swipe_handle).setOnClickListener(v -> {
+            if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            } else {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+            }
+        });
+
 
         setupDrawerList();
 
@@ -75,7 +85,7 @@ public class MainActivity extends AppCompatActivity {
         List<NavDrawerItem> items = buildItemsFromSavedOrder();
         drawerAdapter = new DrawerNavAdapter(items, item -> {
             navigateTo(item.id);
-            drawerLayout.closeDrawer(GravityCompat.START);
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         });
         drawerRecyclerView.setAdapter(drawerAdapter);
 
@@ -89,7 +99,6 @@ public class MainActivity extends AppCompatActivity {
                         int from = viewHolder.getBindingAdapterPosition();
                         int to = target.getBindingAdapterPosition();
                         if (from == RecyclerView.NO_POSITION || to == RecyclerView.NO_POSITION) return false;
-
                         Collections.swap(drawerAdapter.getItems(), from, to);
                         drawerAdapter.notifyItemMoved(from, to);
                         return true;
@@ -99,17 +108,15 @@ public class MainActivity extends AppCompatActivity {
                     public void clearView(@NonNull RecyclerView recyclerView,
                                           @NonNull RecyclerView.ViewHolder viewHolder) {
                         super.clearView(recyclerView, viewHolder);
-                        saveOrderFromItems(drawerAdapter.getItems()); // שומר אחרי שסיימו לגרור
+                        saveOrderFromItems(drawerAdapter.getItems());
                     }
 
                     @Override
-                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
-                        // אין swipe
-                    }
+                    public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) { }
 
                     @Override
                     public boolean isLongPressDragEnabled() {
-                        return true; // גרירה בלחיצה ארוכה
+                        return true;
                     }
                 };
 
@@ -162,26 +169,16 @@ public class MainActivity extends AppCompatActivity {
         if (drawerAdapter != null) drawerAdapter.setSelectedId(R.id.nav_chart);
     }
 
-    // -------------------------
-    // Build items + persistence
-    // -------------------------
     private List<NavDrawerItem> buildItemsFromSavedOrder() {
         String[] defaultKeys = new String[]{
-                "nav_chart",
-                "nav_stocks",
-                "nav_portfolio",
-                "nav_closed_trades",
-                "nav_simulator"
+                "nav_chart", "nav_stocks", "nav_portfolio",
+                "nav_closed_trades", "nav_simulator"
         };
-
         String[] keys = loadKeysOrDefault(defaultKeys);
-
         List<NavDrawerItem> result = new ArrayList<>();
         for (String key : keys) {
             int id = navIdFromKey(key);
-            if (id != 0) {
-                result.add(new NavDrawerItem(id, key, titleForNavId(id)));
-            }
+            if (id != 0) result.add(new NavDrawerItem(id, key, titleForNavId(id)));
         }
         return result;
     }
@@ -205,21 +202,18 @@ public class MainActivity extends AppCompatActivity {
                 out.add(k);
             }
         }
-
         for (String k : defaultKeys) {
             if (!used.contains(k)) out.add(k);
         }
-
         return out.toArray(new String[0]);
     }
 
     private void saveOrderFromItems(List<NavDrawerItem> items) {
         List<String> keys = new ArrayList<>();
         for (NavDrawerItem it : items) keys.add(it.key);
-
         String joined = android.text.TextUtils.join(",", keys);
-        SharedPreferences sp = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
-        sp.edit().putString(KEY_NAV_ORDER, joined).apply();
+        getSharedPreferences(PREFS_NAME, MODE_PRIVATE)
+                .edit().putString(KEY_NAV_ORDER, joined).apply();
     }
 
     private int navIdFromKey(String key) {
@@ -240,9 +234,6 @@ public class MainActivity extends AppCompatActivity {
         return "Item";
     }
 
-    // -------------------------
-    // Notifications permission
-    // -------------------------
     private void requestNotificationPermissionIfNeeded() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                 ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
@@ -250,6 +241,4 @@ public class MainActivity extends AppCompatActivity {
             notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS);
         }
     }
-
-
 }
