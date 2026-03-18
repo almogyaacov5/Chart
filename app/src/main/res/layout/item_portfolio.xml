@@ -24,7 +24,7 @@
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:gravity="center"
-            android:background="@drawable/circle_blue_bg"
+            android:background="@drawable/bg_register_card"
             android:textColor="#FFFFFF"
             android:textSize="16sp"
             android:textStyle="bold"

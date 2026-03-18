@@ -88,14 +88,14 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:padding="12dp">
+            android:padding="8dp">
 
             <ImageButton
                 android:id="@+id/btnRefreshPortfolio"
-                android:layout_width="52dp"
-                android:layout_height="52dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginEnd="10dp"
-                android:background="@drawable/generated_image__46__removebg_preview__1_"
+                android:background="@drawable/main_refresh_button"
                 android:padding="12dp"
                 android:contentDescription="Refresh portfolio"
                 app:srcCompat="@drawable/baseline_refresh_24"

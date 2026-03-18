@@ -47,15 +47,25 @@ public class StocksAdapter extends RecyclerView.Adapter<StocksAdapter.StockViewH
     public void onBindViewHolder(@NonNull StockViewHolder holder, int position) {
         StockData stock = stocks.get(position);
         holder.symbolText.setText(stock.symbol);
-        holder.buyPriceText.setText("Buy Price: " + stock.buyPrice);
+        holder.buyPriceText.setText("Buy: $" + String.format("%.2f", stock.buyPrice));
+
 
         fetchCurrentPrice(stock.symbol, new PriceCallback() {
             @Override
             public void onPriceReceived(float price) {
-                holder.currentPriceText.post(() -> holder.currentPriceText.setText("Current Price: " + price));
-                float percentChange = (stock.buyPrice != 0f) ? ((price - stock.buyPrice) / stock.buyPrice * 100f) : 0f;
-                holder.percentChangeText.post(() ->
-                        holder.percentChangeText.setText("Change: " + String.format("%.2f", percentChange) + "%"));
+                holder.currentPriceText.post(() ->
+                        holder.currentPriceText.setText("Now: $" + String.format("%.2f", price)));
+
+                float percentChange = (stock.buyPrice != 0f) ?
+                        ((price - stock.buyPrice) / stock.buyPrice * 100f) : 0f;
+
+                holder.percentChangeText.post(() -> {
+                    String arrow = percentChange >= 0 ? "▲" : "▼";
+                    String color = percentChange >= 0 ? "#16A34A" : "#EF4444";
+                    holder.percentChangeText.setText(arrow + " " + String.format("%.2f", percentChange) + "%");
+                    holder.percentChangeText.setTextColor(android.graphics.Color.parseColor(color));
+                });
+
             }
             @Override
             public void onError(Exception e) {

@@ -23,8 +23,9 @@ import java.util.concurrent.TimeUnit;
 
 public class LLMService {
 
-    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent";
-    private static final String API_KEY = "AIzaSyCypAZYzEJHLIlNJ27OC70ma3OLccXDveQ";
+    private static final String GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/" +
+            "gemini-flash-latest:generateContent";
+    private static final String API_KEY = BuildConfig.GEMINI_API_KEY;
 
     private final OkHttpClient client = new OkHttpClient.Builder()
             .connectTimeout(30, TimeUnit.SECONDS)
@@ -138,7 +139,14 @@ public class LLMService {
                 // *** תיקון הבעיה – עצירת הלולאה ***
                 if (response.code() == 429) {
                     android.util.Log.w("LLM", "429 - המכסה נגמרה");
-                    notifyError(callback, "❌ המכסה היומית של Gemini נגמרה.\nנסה שוב מחר בשעה 10:00 בבוקר.");
+                    notifyError(callback, "המכסה היומית של Gemini נגמרה.\nנסה שוב מחר בשעה 10:00 בבוקר.");
+                    return;
+                }
+
+                if(response.code()==403)
+                {
+                    android.util.Log.w("LLM", "המכסה ניגמרה להיום, חכה עד מחר בעשר בבוקר");
+                    notifyError(callback, "המכסה היומית של Gemini נגמרה.\nנסה שוב מחר בשעה 10:00 בבוקר.");
                     return;
                 }
 

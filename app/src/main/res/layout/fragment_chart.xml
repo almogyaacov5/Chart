@@ -171,12 +171,11 @@
 
         <ImageButton
             android:id="@+id/btnChartRefresh"
-            android:layout_width="44dp"
-            android:layout_height="44dp"
-            android:background="@drawable/circle_button_background"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/main_refresh_button"
             android:contentDescription="רענן את המעקב"
-            android:src="@drawable/outline_3d_rotation_24"
-            app:tint="@color/colorPrimary" />
+            android:src="@drawable/baseline_refresh_24" />
 
         <Button
             android:id="@+id/btnSelectTimeFrame"

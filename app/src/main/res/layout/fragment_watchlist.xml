@@ -40,9 +40,9 @@
 
         <ImageButton
             android:id="@+id/btnRefreshWatchlist"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:background="@drawable/baseline_refresh_24"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/main_refresh_button"
             app:tint="@color/colorPrimary"
             android:layout_marginStart="8dp"
             android:contentDescription="רענן את המעקב"/>
