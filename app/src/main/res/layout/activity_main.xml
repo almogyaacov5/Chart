@@ -7,13 +7,14 @@
     android:fitsSystemWindows="true">
 
     <!-- תוכן ראשי -->
+
+    <!-- רצועת swipe בתחתית -->
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true"/>
+        android:fitsSystemWindows="true" />
 
-    <!-- רצועת swipe בתחתית -->
     <View
         android:id="@+id/swipe_handle"
         android:layout_width="60dp"
