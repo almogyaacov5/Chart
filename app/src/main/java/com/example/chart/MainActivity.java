@@ -34,7 +34,12 @@ public class MainActivity extends AppCompatActivity {
     private static final String KEY_NAV_ORDER = "nav_order";
 
     private final ActivityResultLauncher<String> notificationPermissionLauncher =
-            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> { });
+            registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                // לאחר קבלת ההרשאה — מתזמנים את ה-Alarm
+                if (isGranted) {
+                    PriceAlertScheduler.schedule(this);
+                }
+            });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +47,9 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         requestNotificationPermissionIfNeeded();
+
+        // הפעלת AlarmManager לבדיקת מחירים ברקע כל 15 דקות
+        PriceAlertScheduler.schedule(this);
 
         drawerRecyclerView = findViewById(R.id.drawerRecyclerView);
 
@@ -71,12 +79,17 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-
         setupDrawerList();
 
         if (savedInstanceState == null) {
             navigateTo(R.id.nav_chart);
         }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // ה-Alarm ממשיך לפעול גם אחרי סגירת האפליקציה — לא מבטלים כאן
     }
 
     private void setupDrawerList() {
